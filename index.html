@@ -4,11 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Frappy</title>
-    <script src="https://cdn.jsdelivr.net/npm/webtorrent@latest/webtorrent.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-        *{margin:0;padding:0;box-sizing:border-box}
+        *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
         :root{--pink:#cd00cd;--purple:#9400d3;--bg:#06030a;--text:#e8d5f5;--text2:#8b6ba0}
         body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;overflow:hidden}
         .server-bar{width:60px;background:rgba(5,2,10,0.95);backdrop-filter:blur(20px);display:flex;flex-direction:column;align-items:center;gap:10px;padding:16px 6px;flex-shrink:0;border-right:1px solid rgba(205,0,205,0.12);z-index:10}
@@ -23,17 +22,17 @@
         .search-box{flex:1;padding:12px 16px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(205,0,205,0.15);color:#e8d5f5;font-size:14px;outline:none}
         .search-btn{padding:12px 20px;border-radius:12px;background:#cd00cd;color:#fff;border:none;font-weight:600;cursor:pointer}
         .card{display:flex;gap:12px;padding:12px;border-radius:12px;cursor:pointer;margin-bottom:8px;background:rgba(20,10,30,0.6);border:1px solid rgba(205,0,205,0.08)}
-        .card-thumb{width:50px;height:50px;border-radius:10px;background:linear-gradient(135deg,#cd00cd,#9400d3);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
-        .card-info{flex:1;min-width:0}
-        .card-title{font-weight:600;font-size:14px;margin-bottom:4px}
+        .card-thumb{width:50px;height:50px;border-radius:10px;background-size:cover;background-position:center;flex-shrink:0}
+        .card-info{flex:1;min-width:0;overflow:hidden}
+        .card-title{font-weight:600;font-size:14px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
         .card-sub{color:#8b6ba0;font-size:12px}
         .now-bar{position:fixed;bottom:16px;left:76px;right:16px;background:rgba(15,5,25,0.97);backdrop-filter:blur(20px);border:1px solid rgba(205,0,205,0.2);border-radius:16px;padding:10px 14px;z-index:40;display:none;align-items:center;gap:10px}
         .now-bar.active{display:flex}
         .now-progress{position:absolute;top:0;left:8px;right:8px;height:2px;background:rgba(255,255,255,0.1);border-radius:0 0 4px 4px}
         .now-progress-fill{width:0;height:100%;background:linear-gradient(90deg,#cd00cd,#9400d3);border-radius:0 0 4px 4px;transition:width 0.5s linear}
-        .now-thumb{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#cd00cd,#9400d3);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-        .now-info{flex:1;min-width:0}
-        .now-title{font-weight:600;font-size:13px}
+        .now-thumb{width:40px;height:40px;border-radius:10px;background-size:cover;background-position:center;flex-shrink:0}
+        .now-info{flex:1;min-width:0;overflow:hidden}
+        .now-title{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
         .now-artist{color:#8b6ba0;font-size:11px}
         .now-controls{display:flex;gap:10px;align-items:center}
         .now-btn{background:none;border:none;color:#fff;font-size:18px;cursor:pointer;padding:6px}
@@ -58,11 +57,23 @@
         </div>
         <div id="musicList"><div style="text-align:center;color:#8b6ba0;padding:40px">Введи название и нажми Найти</div></div>
     </div>
+    
+    <div class="screen" id="screen-video">
+        <div class="search-row">
+            <input type="text" class="search-box" placeholder="Поиск видео..." id="videoInput">
+            <button class="search-btn" id="btnVideoSearch">Найти</button>
+        </div>
+        <div id="videoList"></div>
+    </div>
+    
+    <div class="screen" id="screen-chats">
+        <div style="text-align:center;color:#8b6ba0;padding:40px"><i class="fa-solid fa-message" style="font-size:48px;color:#cd00cd;margin-bottom:12px"></i><div>Чаты скоро будут</div></div>
+    </div>
 </div>
 
 <div class="now-bar" id="nowBar">
     <div class="now-progress"><div class="now-progress-fill" id="nowProgressFill"></div></div>
-    <div class="now-thumb" id="nowThumb">🧲</div>
+    <div class="now-thumb" id="nowThumb">🎵</div>
     <div class="now-info">
         <div class="now-title" id="nowTitle">Выбери трек</div>
         <div class="now-artist" id="nowArtist">Нажми на трек</div>
@@ -74,169 +85,63 @@
     </div>
 </div>
 
+<iframe id="audioFrame" style="display:none" allow="autoplay"></iframe>
+
 <script>
-const client = new WebTorrent();
-let currentTorrent = null;
-let tracks = [];
-let currentIndex = -1;
-let isPlaying = false;
-let progressInterval;
+const SERVER = 'https://frappy-server.onrender.com';
 
-document.getElementById('btnMusicSearch').addEventListener('click', searchRutracker);
-document.getElementById('nowPlayBtn').addEventListener('click', togglePlay);
-document.getElementById('nowPrev').addEventListener('click', prev);
-document.getElementById('nowNext').addEventListener('click', next);
+let tracks=[],currentIndex=-1,isPlaying=!1,progressInterval;
 
-// Поиск через Rutracker (прокси для обхода CORS)
-async function searchRutracker() {
-    const q = document.getElementById('musicInput').value.trim();
-    if (!q) return;
-    
-    document.getElementById('musicList').innerHTML = '<div style="text-align:center;color:#8b6ba0;padding:40px">Ищу на Rutracker...</div>';
-    
-    try {
-        // Используем CORS прокси для запроса к Rutracker
-        const proxy = 'https://api.allorigins.win/raw?url=';
-        const url = `https://rutracker.org/forum/tracker.php?nm=${encodeURIComponent(q)}`;
-        
-        const res = await fetch(proxy + encodeURIComponent(url));
-        const html = await res.text();
-        
-        // Парсим результаты
-        const results = [];
-        const rows = html.match(/<tr class="tCenter hl-tr">.*?<\/tr>/gs) || [];
-        
-        rows.forEach(row => {
-            const titleMatch = row.match(/<a.*?class="med tLeft t-title-font".*?>(.*?)<\/a>/);
-            const sizeMatch = row.match(/<td class="tCenter small">(.*?)<\/td>/);
-            const seedsMatch = row.match(/<td class="tCenter small"><b>(.*?)<\/b><\/td>/);
-            const magnetMatch = row.match(/href="(magnet:\?xt=urn:btih:[^"]+)"/);
-            
-            if (titleMatch && magnetMatch) {
-                results.push({
-                    title: titleMatch[1].replace(/<\/?[^>]+(>|$)/g, '').trim(),
-                    artist: 'Rutracker',
-                    magnet: magnetMatch[1],
-                    size: sizeMatch ? sizeMatch[1] : '?',
-                    seeds: seedsMatch ? seedsMatch[1] : '?'
-                });
-            }
-        });
-        
-        if (results.length > 0) {
-            tracks = results;
-            renderTracks();
-        } else {
-            document.getElementById('musicList').innerHTML = '<div style="text-align:center;color:#8b6ba0;padding:40px">Ничего не найдено</div>';
-        }
-    } catch(e) {
-        document.getElementById('musicList').innerHTML = '<div style="text-align:center;color:#8b6ba0;padding:40px">Ошибка поиска. Попробуй позже</div>';
-    }
+document.getElementById('btnMusic').addEventListener('click',()=>{switchTab('music')});
+document.getElementById('btnVideo').addEventListener('click',()=>{switchTab('video')});
+document.getElementById('btnChats').addEventListener('click',()=>{switchTab('chats')});
+document.getElementById('btnMusicSearch').addEventListener('click',searchMusic);
+document.getElementById('nowPlayBtn').addEventListener('click',togglePlay);
+document.getElementById('nowPrev').addEventListener('click',prev);
+document.getElementById('nowNext').addEventListener('click',next);
+
+function switchTab(t){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+t).classList.add('active');document.querySelectorAll('.server-icon').forEach(s=>s.classList.remove('active'));if(t==='music')document.getElementById('btnMusic').classList.add('active');if(t==='video')document.getElementById('btnVideo').classList.add('active');if(t==='chats')document.getElementById('btnChats').classList.add('active')}
+
+async function searchMusic(){
+    let q=document.getElementById('musicInput').value.trim();
+    if(!q)return;
+    document.getElementById('musicList').innerHTML='<div style="text-align:center;color:#8b6ba0;padding:40px">Ищу...</div>';
+    try{
+        let res=await fetch(`${SERVER}/search?q=${encodeURIComponent(q)}`);
+        let data=await res.json();
+        if(Array.isArray(data) && data.length>0){tracks=data;renderTracks()}
+        else{document.getElementById('musicList').innerHTML='<div style="text-align:center;color:#8b6ba0;padding:40px">Ничего не найдено</div>'}
+    }catch(e){document.getElementById('musicList').innerHTML='<div style="text-align:center;color:#8b6ba0;padding:40px">Ошибка сервера</div>'}
 }
 
-function renderTracks() {
-    document.getElementById('musicList').innerHTML = tracks.map((t, i) => `
-        <div class="card" onclick="playMusic(${i})">
-            <div class="card-thumb">🧲</div>
-            <div class="card-info">
-                <div class="card-title">${t.title.length > 50 ? t.title.substring(0, 50) + '...' : t.title}</div>
-                <div class="card-sub">📦 ${t.size} | 🔥 ${t.seeds} сидов</div>
-            </div>
-        </div>
-    `).join('');
-}
+function renderTracks(){document.getElementById('musicList').innerHTML=tracks.map((t,i)=>`<div class="card" onclick="playMusic(${i})"><div class="card-thumb" style="background-image:url('${t.thumb}')"></div><div class="card-info"><div class="card-title">${t.title.length>40?t.title.substring(0,40)+'...':t.title}</div><div class="card-sub">${t.artist}</div></div></div>`).join('')}
 
-function playMusic(index) {
-    currentIndex = index;
-    const track = tracks[index];
-    
-    if (currentTorrent) {
-        currentTorrent.destroy();
-    }
-    
-    document.getElementById('nowThumb').textContent = '🧲';
-    document.getElementById('nowTitle').textContent = track.title;
-    document.getElementById('nowArtist').textContent = 'Загрузка...';
+function playMusic(i){
+    currentIndex=i;let t=tracks[i],nt=document.getElementById('nowThumb');
+    if(t.thumb?.startsWith('http')){nt.style.backgroundImage=`url('${t.thumb}')`;nt.textContent=''}else{nt.style.backgroundImage='';nt.textContent='🎵'}
+    document.getElementById('nowTitle').textContent=t.title;
+    document.getElementById('nowArtist').textContent='Загрузка...';
     document.getElementById('nowBar').classList.add('active');
     
-    client.add(track.magnet, (torrent) => {
-        currentTorrent = torrent;
-        const audioFiles = torrent.files.filter(f => 
-            f.name.endsWith('.mp3') || f.name.endsWith('.flac') || f.name.endsWith('.ogg') || f.name.endsWith('.wav')
-        );
-        
-        if (audioFiles.length > 0) {
-            const file = audioFiles[0];
-            file.appendTo('body');
-            const audio = document.querySelector('audio');
-            if (audio) {
-                audio.style.display = 'none';
-                audio.play();
+    function tryStream(){
+        document.getElementById('audioFrame').src=`${SERVER}/stream/${t.id}`;
+        setTimeout(()=>{
+            if(document.getElementById('nowArtist').textContent==='Загрузка...'){
+                document.getElementById('nowArtist').textContent='Ожидание...';
+                tryStream();
             }
-            document.getElementById('nowArtist').textContent = 'Играет';
-        } else {
-            document.getElementById('nowArtist').textContent = 'Нет аудио';
-        }
-        
-        // Обновляем прогресс
-        torrent.on('download', () => {
-            const progress = (torrent.progress * 100).toFixed(1);
-            document.getElementById('nowArtist').textContent = `Загрузка: ${progress}%`;
-        });
-        
-        torrent.on('done', () => {
-            document.getElementById('nowArtist').textContent = 'Трек загружен';
-        });
-    });
+        },3000);
+    }
+    tryStream();
     
-    isPlaying = true;
-    document.getElementById('nowPlayBtn').innerHTML = '<i class="fa-solid fa-pause"></i>';
+    isPlaying=!0;document.getElementById('nowPlayBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
     startProgress();
 }
 
-function togglePlay() {
-    if (isPlaying) {
-        const audio = document.querySelector('audio');
-        if (audio) audio.pause();
-        isPlaying = false;
-        document.getElementById('nowPlayBtn').innerHTML = '<i class="fa-solid fa-play"></i>';
-        clearInterval(progressInterval);
-    } else if (currentIndex >= 0) {
-        const audio = document.querySelector('audio');
-        if (audio) audio.play();
-        isPlaying = true;
-        document.getElementById('nowPlayBtn').innerHTML = '<i class="fa-solid fa-pause"></i>';
-        startProgress();
-    }
-}
-
-function next() { if (tracks.length) { currentIndex = (currentIndex + 1) % tracks.length; playMusic(currentIndex); } }
-function prev() { if (tracks.length) { currentIndex = (currentIndex - 1 + tracks.length) % tracks.length; playMusic(currentIndex); } }
-
-function startProgress() {
-    clearInterval(progressInterval);
-    let w = 0;
-    document.getElementById('nowProgressFill').style.width = '0%';
-    progressInterval = setInterval(() => {
-        w += 0.5;
-        if (w >= 100) { w = 0; next(); }
-        document.getElementById('nowProgressFill').style.width = w + '%';
-    }, 1000);
-}
-
-// Переключение вкладок
-document.getElementById('btnMusic').addEventListener('click', ()=>{switchTab('music')});
-document.getElementById('btnVideo').addEventListener('click', ()=>{switchTab('video')});
-document.getElementById('btnChats').addEventListener('click', ()=>{switchTab('chats')});
-
-function switchTab(t){
-    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-    document.getElementById('screen-'+t).classList.add('active');
-    document.querySelectorAll('.server-icon').forEach(s=>s.classList.remove('active'));
-    if(t==='music')document.getElementById('btnMusic').classList.add('active');
-    if(t==='video')document.getElementById('btnVideo').classList.add('active');
-    if(t==='chats')document.getElementById('btnChats').classList.add('active');
-}
+function togglePlay(){if(isPlaying){document.getElementById('audioFrame').src='';isPlaying=!1;document.getElementById('nowPlayBtn').innerHTML='<i class="fa-solid fa-play"></i>';clearInterval(progressInterval)}else if(currentIndex>=0)playMusic(currentIndex)}
+function next(){if(tracks.length){currentIndex=(currentIndex+1)%tracks.length;playMusic(currentIndex)}}
+function prev(){if(tracks.length){currentIndex=(currentIndex-1+tracks.length)%tracks.length;playMusic(currentIndex)}}
+function startProgress(){clearInterval(progressInterval);let w=0;document.getElementById('nowProgressFill').style.width='0%';progressInterval=setInterval(()=>{w+=0.5;if(w>=100){w=0;next()}document.getElementById('nowProgressFill').style.width=w+'%'},1000)}
 </script>
 </body>
 </html>
