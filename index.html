@@ -27,7 +27,6 @@
             overflow: hidden;
         }
         
-        /* СЕРВЕРНАЯ ПАНЕЛЬ */
         .server-bar {
             width: 60px; background: rgba(5,2,10,0.95); backdrop-filter: blur(20px);
             display: flex; flex-direction: column; align-items: center;
@@ -104,7 +103,6 @@
         }
         .fav-btn.liked { color: #ff4466; }
         
-        /* NOW BAR */
         .now-bar {
             position: fixed; bottom: 16px; left: 76px; right: 16px;
             background: rgba(15,5,25,0.97); backdrop-filter: blur(20px);
@@ -141,7 +139,6 @@
         }
         .now-btn.liked { color: #ff4466; }
         
-        /* ВИДЕО ПЛЕЕР С НЕОНОВОЙ РАМКОЙ */
         .video-overlay {
             position: fixed; inset: 0; background: #000;
             z-index: 50; display: none; flex-direction: column;
@@ -160,9 +157,7 @@
             -webkit-mask-composite: xor; mask-composite: exclude;
             animation: neonPulse 2s ease-in-out infinite; pointer-events: none; z-index: 1;
         }
-        @keyframes neonPulse {
-            0%,100%{opacity:0.5} 50%{opacity:1}
-        }
+        @keyframes neonPulse { 0%,100%{opacity:0.5} 50%{opacity:1} }
         
         .video-frame-wrap iframe {
             width: 100%; height: 100%; max-height: 70vh;
@@ -179,10 +174,7 @@
             border-radius: 50%; transition: 0.2s;
         }
         .vc-btn:hover { background: rgba(205,0,205,0.3); }
-        .vc-btn.play {
-            width: 44px; height: 44px; background: #cd00cd;
-            border-radius: 50%; font-size: 18px;
-        }
+        .vc-btn.play { width: 44px; height: 44px; background: #cd00cd; border-radius: 50%; font-size: 18px; }
         .close-video {
             position: absolute; top: 20px; right: 20px;
             width: 40px; height: 40px; border-radius: 50%;
@@ -194,47 +186,44 @@
 <body>
 
     <div class="server-bar">
-        <button class="server-icon active" onclick="switchTab('music')"><i class="fa-solid fa-headphones"></i></button>
-        <button class="server-icon" onclick="switchTab('video')"><i class="fa-solid fa-film"></i></button>
-        <button class="server-icon" onclick="switchTab('chats')"><i class="fa-solid fa-message"></i></button>
+        <button class="server-icon active" id="btnMusic"><i class="fa-solid fa-headphones"></i></button>
+        <button class="server-icon" id="btnVideo"><i class="fa-solid fa-film"></i></button>
+        <button class="server-icon" id="btnChats"><i class="fa-solid fa-message"></i></button>
     </div>
 
     <div class="main-content">
         <div class="header"><div class="logo">FRAPPY</div></div>
 
-        <!-- МУЗЫКА -->
         <div class="screen active" id="screen-music">
             <div class="tab-row">
-                <button class="tab-btn active" onclick="switchMusicTab('search')">Поиск</button>
-                <button class="tab-btn" onclick="switchMusicTab('favorites')">Избранное</button>
-                <button class="tab-btn" onclick="switchMusicTab('wave')">Моя волна</button>
+                <button class="tab-btn active" id="tabSearch">Поиск</button>
+                <button class="tab-btn" id="tabFav">Избранное</button>
+                <button class="tab-btn" id="tabWave">Моя волна</button>
             </div>
             <div id="musicSearch">
                 <div class="search-row">
                     <input type="text" class="search-box" placeholder="Поиск трека..." id="musicInput">
-                    <button class="search-btn" onclick="searchMusic()">Найти</button>
+                    <button class="search-btn" id="btnMusicSearch">Найти</button>
                 </div>
                 <div id="musicList"></div>
             </div>
             <div id="musicFavorites" style="display:none"><div id="favList"></div></div>
             <div id="musicWave" style="display:none">
                 <div style="text-align:center;padding:40px">
-                    <button onclick="startWave()" style="padding:12px 24px;border-radius:20px;background:#cd00cd;color:#fff;border:none;font-weight:600;cursor:pointer">Запустить волну</button>
+                    <button id="btnStartWave" style="padding:12px 24px;border-radius:20px;background:#cd00cd;color:#fff;border:none;font-weight:600;cursor:pointer">Запустить волну</button>
                     <div id="waveTrack" style="margin-top:16px;font-weight:600"></div>
                 </div>
             </div>
         </div>
 
-        <!-- ВИДЕО -->
         <div class="screen" id="screen-video">
             <div class="search-row">
                 <input type="text" class="search-box" placeholder="Поиск видео..." id="videoInput">
-                <button class="search-btn" onclick="searchVideo()">Найти</button>
+                <button class="search-btn" id="btnVideoSearch">Найти</button>
             </div>
             <div id="videoList"></div>
         </div>
 
-        <!-- ЧАТЫ -->
         <div class="screen" id="screen-chats">
             <div style="text-align:center;color:#8b6ba0;padding:40px">
                 <i class="fa-solid fa-message" style="font-size:48px;color:#cd00cd;margin-bottom:12px"></i>
@@ -243,7 +232,6 @@
         </div>
     </div>
 
-    <!-- NOW BAR -->
     <div class="now-bar" id="nowBar">
         <div class="now-progress"><div class="now-progress-fill" id="nowProgressFill"></div></div>
         <div class="now-thumb" id="nowThumb">🎵</div>
@@ -252,32 +240,31 @@
             <div class="now-artist" id="nowArtist">Нажми на трек</div>
         </div>
         <div class="now-controls">
-            <button class="now-btn" id="nowFavBtn" onclick="toggleFavCurrent()"><i class="fa-solid fa-heart"></i></button>
-            <button class="now-btn" onclick="prev()"><i class="fa-solid fa-backward-step"></i></button>
-            <button class="now-btn play" id="nowPlayBtn" onclick="togglePlay()"><i class="fa-solid fa-play"></i></button>
-            <button class="now-btn" onclick="next()"><i class="fa-solid fa-forward-step"></i></button>
+            <button class="now-btn" id="nowFavBtn"><i class="fa-solid fa-heart"></i></button>
+            <button class="now-btn" id="nowPrev"><i class="fa-solid fa-backward-step"></i></button>
+            <button class="now-btn play" id="nowPlayBtn"><i class="fa-solid fa-play"></i></button>
+            <button class="now-btn" id="nowNext"><i class="fa-solid fa-forward-step"></i></button>
         </div>
     </div>
 
-    <!-- ВИДЕО ПЛЕЕР -->
     <div class="video-overlay" id="videoOverlay">
-        <button class="close-video" onclick="closeVideo()">✕</button>
+        <button class="close-video" id="btnCloseVideo">✕</button>
         <div class="video-frame-wrap">
             <iframe id="videoFrame" allow="autoplay; fullscreen"></iframe>
         </div>
         <div class="video-controls">
-            <button class="vc-btn" onclick="videoPrev()"><i class="fa-solid fa-backward-step"></i></button>
-            <button class="vc-btn play" id="videoPlayBtn" onclick="videoTogglePlay()"><i class="fa-solid fa-pause"></i></button>
-            <button class="vc-btn" onclick="videoNext()"><i class="fa-solid fa-forward-step"></i></button>
+            <button class="vc-btn" id="btnVideoPrev"><i class="fa-solid fa-backward-step"></i></button>
+            <button class="vc-btn play" id="btnVideoPlay"><i class="fa-solid fa-pause"></i></button>
+            <button class="vc-btn" id="btnVideoNext"><i class="fa-solid fa-forward-step"></i></button>
             <span style="flex:1"></span>
-            <button class="vc-btn" onclick="closeVideo()"><i class="fa-solid fa-xmark"></i></button>
+            <button class="vc-btn" id="btnVideoClose"><i class="fa-solid fa-xmark"></i></button>
         </div>
     </div>
 
     <iframe id="audioFrame" style="display:none" allow="autoplay"></iframe>
 
     <script>
-        const API_KEY = '';
+        const API_KEY = 'AIzaSyDW1cbsx1G-w6ogFtBI_tEvjpvk5bRuwzU';
         
         let tracks = [];
         let videos = [];
@@ -288,19 +275,45 @@
         let progressInterval;
         let currentMusicTab = 'search';
         
+        // ВСЕ ОБРАБОТЧИКИ КНОПОК
+        document.getElementById('btnMusic').addEventListener('click', function() { switchTab('music'); });
+        document.getElementById('btnVideo').addEventListener('click', function() { switchTab('video'); });
+        document.getElementById('btnChats').addEventListener('click', function() { switchTab('chats'); });
+        
+        document.getElementById('tabSearch').addEventListener('click', function() { switchMusicTab('search'); });
+        document.getElementById('tabFav').addEventListener('click', function() { switchMusicTab('favorites'); });
+        document.getElementById('tabWave').addEventListener('click', function() { switchMusicTab('wave'); });
+        
+        document.getElementById('btnMusicSearch').addEventListener('click', searchMusic);
+        document.getElementById('btnVideoSearch').addEventListener('click', searchVideo);
+        document.getElementById('btnStartWave').addEventListener('click', startWave);
+        
+        document.getElementById('nowPlayBtn').addEventListener('click', togglePlay);
+        document.getElementById('nowPrev').addEventListener('click', prev);
+        document.getElementById('nowNext').addEventListener('click', next);
+        document.getElementById('nowFavBtn').addEventListener('click', toggleFavCurrent);
+        
+        document.getElementById('btnCloseVideo').addEventListener('click', closeVideo);
+        document.getElementById('btnVideoClose').addEventListener('click', closeVideo);
+        document.getElementById('btnVideoPrev').addEventListener('click', videoPrev);
+        document.getElementById('btnVideoNext').addEventListener('click', videoNext);
+        
         function switchTab(tab) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('screen-' + tab).classList.add('active');
-            document.querySelectorAll('.server-icon').forEach((s, i) => {
-                s.classList.remove('active');
-                if ((tab === 'music' && i === 0) || (tab === 'video' && i === 1) || (tab === 'chats' && i === 2)) s.classList.add('active');
-            });
+            document.querySelectorAll('.server-icon').forEach(s => s.classList.remove('active'));
+            if (tab === 'music') document.getElementById('btnMusic').classList.add('active');
+            if (tab === 'video') document.getElementById('btnVideo').classList.add('active');
+            if (tab === 'chats') document.getElementById('btnChats').classList.add('active');
         }
         
         function switchMusicTab(tab) {
             currentMusicTab = tab;
             document.querySelectorAll('#screen-music .tab-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
+            if (tab === 'search') document.getElementById('tabSearch').classList.add('active');
+            if (tab === 'favorites') document.getElementById('tabFav').classList.add('active');
+            if (tab === 'wave') document.getElementById('tabWave').classList.add('active');
+            
             document.getElementById('musicSearch').style.display = tab === 'search' ? 'block' : 'none';
             document.getElementById('musicFavorites').style.display = tab === 'favorites' ? 'block' : 'none';
             document.getElementById('musicWave').style.display = tab === 'wave' ? 'block' : 'none';
@@ -316,18 +329,14 @@
                 const data = await res.json();
                 if (data.items) {
                     tracks = data.items.map(item => ({ id: item.id.videoId, title: item.snippet.title, artist: item.snippet.channelTitle, thumb: item.snippet.thumbnails.default.url }));
-                    renderMusicList(tracks, 'musicList');
+                    document.getElementById('musicList').innerHTML = tracks.map((t, i) => `
+                        <div class="card" onclick="playMusic(${i})">
+                            <div class="card-thumb" style="background-image:url('${t.thumb}')"></div>
+                            <div class="card-info"><div class="card-title">${t.title}</div><div class="card-sub">🎵 ${t.artist}</div></div>
+                            <button class="fav-btn ${isFav(t.id)?'liked':''}" onclick="event.stopPropagation();toggleFav('${t.id}','${t.title.replace(/'/g,"\\'")}','${t.artist.replace(/'/g,"\\'")}','${t.thumb}')"><i class="fa-solid fa-heart"></i></button>
+                        </div>`).join('');
                 }
             } catch(e) {}
-        }
-        
-        function renderMusicList(list, id) {
-            document.getElementById(id).innerHTML = list.map((t, i) => `
-                <div class="card" onclick="playMusic(${i})">
-                    <div class="card-thumb" style="background-image:url('${t.thumb}')"></div>
-                    <div class="card-info"><div class="card-title">${t.title}</div><div class="card-sub">🎵 ${t.artist}</div></div>
-                    <button class="fav-btn ${isFav(t.id)?'liked':''}" onclick="event.stopPropagation();toggleFav('${t.id}','${t.title.replace(/'/g,"\\'")}','${t.artist.replace(/'/g,"\\'")}','${t.thumb}')"><i class="fa-solid fa-heart"></i></button>
-                </div>`).join('');
         }
         
         function isFav(id) { return favorites.some(f => f.id === id); }
@@ -336,24 +345,26 @@
             if (isFav(id)) favorites = favorites.filter(f => f.id !== id);
             else favorites.push({ id, title, artist, thumb });
             localStorage.setItem('frappy_favs', JSON.stringify(favorites));
-            if (currentMusicTab === 'search') renderMusicList(tracks, 'musicList');
-            if (currentMusicTab === 'favorites') renderFavorites();
             updateNowFavBtn();
         }
         
         function toggleFavCurrent() { if (currentIndex >= 0) { const t = tracks[currentIndex]; toggleFav(t.id, t.title, t.artist, t.thumb); } }
-        
         function updateNowFavBtn() { if (currentIndex >= 0) document.getElementById('nowFavBtn').classList.toggle('liked', isFav(tracks[currentIndex].id)); }
         
         function renderFavorites() {
             if (favorites.length === 0) { document.getElementById('favList').innerHTML = '<div style="text-align:center;color:#8b6ba0;padding:40px">Нет избранных треков</div>'; return; }
-            tracks = [...favorites]; renderMusicList(favorites, 'favList');
+            tracks = [...favorites];
+            document.getElementById('favList').innerHTML = tracks.map((t, i) => `
+                <div class="card" onclick="playMusic(${i})">
+                    <div class="card-thumb" style="background-image:url('${t.thumb}')"></div>
+                    <div class="card-info"><div class="card-title">${t.title}</div><div class="card-sub">🎵 ${t.artist}</div></div>
+                </div>`).join('');
         }
         
         async function startWave() {
             document.getElementById('waveTrack').textContent = 'Подбираю...';
             let q = 'popular music';
-            if (favorites.length > 0) { const f = favorites[Math.floor(Math.random()*favorites.length)]; q = f.artist + ' ' + f.title.split(' ').slice(0,2).join(' '); }
+            if (favorites.length > 0) { const f = favorites[Math.floor(Math.random()*favorites.length)]; q = f.artist; }
             try {
                 const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&type=video&maxResults=5&key=${API_KEY}`);
                 const data = await res.json();
@@ -378,31 +389,4 @@
             updateNowFavBtn();
             document.getElementById('audioFrame').src = `https://www.youtube.com/embed/${t.id}?autoplay=1&controls=0`;
             isPlaying = true;
-            document.getElementById('nowPlayBtn').innerHTML = '<i class="fa-solid fa-pause"></i>';
-            startProgress();
-        }
-        
-        function togglePlay() {
-            if (isPlaying) { document.getElementById('audioFrame').src = ''; isPlaying = false; document.getElementById('nowPlayBtn').innerHTML = '<i class="fa-solid fa-play"></i>'; clearInterval(progressInterval); }
-            else if (currentIndex >= 0) playMusic(currentIndex);
-        }
-        
-        function next() { if (tracks.length) { currentIndex = (currentIndex+1) % tracks.length; playMusic(currentIndex); } }
-        function prev() { if (tracks.length) { currentIndex = (currentIndex-1+tracks.length) % tracks.length; playMusic(currentIndex); } }
-        
-        function startProgress() {
-            clearInterval(progressInterval); let w = 0;
-            document.getElementById('nowProgressFill').style.width = '0%';
-            progressInterval = setInterval(() => { w += 0.5; if (w >= 100) { w = 0; next(); } document.getElementById('nowProgressFill').style.width = w + '%'; }, 1000);
-        }
-        
-        // ВИДЕО
-        async function searchVideo() {
-            const q = document.getElementById('videoInput').value.trim();
-            if (!q) return;
-            document.getElementById('videoList').innerHTML = '<div style="text-align:center;color:#8b6ba0;padding:40px">Ищу...</div>';
-            try {
-                const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&type=video&maxResults=15&key=${API_KEY}`);
-                const data = await res.json();
-                if (data.items) {
-                   
+            document.getElementById('nowPlayBtn').innerHT
