@@ -88,8 +88,9 @@
 <iframe id="audioFrame" style="display:none" allow="autoplay"></iframe>
 
 <script>
-const API_KEY='AIzaSyDW1cbsx1G-w6ogFtBI_tEvjpvk5bRuwzU';
-const PROXIES=['https://api.allorigins.win/raw?url=','https://corsproxy.io/?',''];
+// ТВОЙ СЕРВЕР НА RENDER (работает без VPN!)
+const SERVER = 'https://frappy-app.onrender.com';
+
 let tracks=[],currentIndex=-1,isPlaying=!1,progressInterval;
 
 document.getElementById('btnMusic').addEventListener('click',()=>{switchTab('music')});
@@ -103,18 +104,16 @@ document.getElementById('nowNext').addEventListener('click',next);
 
 function switchTab(t){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+t).classList.add('active');document.querySelectorAll('.server-icon').forEach(s=>s.classList.remove('active'));if(t==='music')document.getElementById('btnMusic').classList.add('active');if(t==='video')document.getElementById('btnVideo').classList.add('active');if(t==='chats')document.getElementById('btnChats').classList.add('active')}
 
-async function fetchWithProxy(url){for(let p of PROXIES){try{let r=await fetch(p?p+encodeURIComponent(url):url);if(r.ok)return await r.json()}catch(e){continue}}throw new Error('All proxies failed')}
-
-function shorten(t){return t.length>40?t.substring(0,40)+'...':t}
-
 async function searchMusic(){
     let q=document.getElementById('musicInput').value.trim();
     if(!q)return;
     document.getElementById('musicList').innerHTML='<div style="text-align:center;color:#8b6ba0;padding:40px">Ищу...</div>';
     try{
-        let d=await fetchWithProxy(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q+' music')}&type=video&maxResults=15&key=${API_KEY}`);
-        if(d.items?.length){tracks=d.items.map(i=>({id:i.id.videoId,title:i.snippet.title,artist:i.snippet.channelTitle,thumb:i.snippet.thumbnails.default.url}));renderTracks()}
-    }catch(e){document.getElementById('musicList').innerHTML='<div style="text-align:center;color:#8b6ba0;padding:40px">Ошибка. Нужен VPN</div>'}
+        let res=await fetch(`${SERVER}/search?q=${encodeURIComponent(q)}`);
+        let data=await res.json();
+        if(Array.isArray(data) && data.length>0){tracks=data;renderTracks()}
+        else{document.getElementById('musicList').innerHTML='<div style="text-align:center;color:#8b6ba0;padding:40px">Ничего не найдено</div>'}
+    }catch(e){document.getElementById('musicList').innerHTML='<div style="text-align:center;color:#8b6ba0;padding:40px">Ошибка сервера</div>'}
 }
 
 async function searchVideo(){
@@ -122,12 +121,13 @@ async function searchVideo(){
     if(!q)return;
     document.getElementById('videoList').innerHTML='<div style="text-align:center;color:#8b6ba0;padding:40px">Ищу...</div>';
     try{
-        let d=await fetchWithProxy(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&type=video&maxResults=15&key=${API_KEY}`);
-        if(d.items?.length){document.getElementById('videoList').innerHTML=d.items.map(i=>`<div class="card" onclick="playVideo('${i.id.videoId}')"><div class="card-thumb" style="background-image:url('${i.snippet.thumbnails.default.url}')"></div><div class="card-info"><div class="card-title">${shorten(i.snippet.title)}</div><div class="card-sub">${i.snippet.channelTitle}</div></div></div>`).join('')}
-    }catch(e){document.getElementById('videoList').innerHTML='<div style="text-align:center;color:#8b6ba0;padding:40px">Ошибка. Нужен VPN</div>'}
+        let res=await fetch(`${SERVER}/search?q=${encodeURIComponent(q)}`);
+        let data=await res.json();
+        if(Array.isArray(data) && data.length>0){document.getElementById('videoList').innerHTML=data.map(i=>`<div class="card" onclick="playVideo('${i.id}')"><div class="card-thumb" style="background-image:url('${i.thumb}')"></div><div class="card-info"><div class="card-title">${i.title.length>40?i.title.substring(0,40)+'...':i.title}</div><div class="card-sub">${i.artist}</div></div></div>`).join('')}
+    }catch(e){document.getElementById('videoList').innerHTML='<div style="text-align:center;color:#8b6ba0;padding:40px">Ошибка сервера</div>'}
 }
 
-function renderTracks(){document.getElementById('musicList').innerHTML=tracks.map((t,i)=>`<div class="card" onclick="playMusic(${i})"><div class="card-thumb" style="background-image:url('${t.thumb}')"></div><div class="card-info"><div class="card-title">${shorten(t.title)}</div><div class="card-sub">${t.artist}</div></div></div>`).join('')}
+function renderTracks(){document.getElementById('musicList').innerHTML=tracks.map((t,i)=>`<div class="card" onclick="playMusic(${i})"><div class="card-thumb" style="background-image:url('${t.thumb}')"></div><div class="card-info"><div class="card-title">${t.title.length>40?t.title.substring(0,40)+'...':t.title}</div><div class="card-sub">${t.artist}</div></div></div>`).join('')}
 
 function playMusic(i){
     currentIndex=i;let t=tracks[i],nt=document.getElementById('nowThumb');
