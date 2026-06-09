@@ -85,9 +85,25 @@
             background-size: cover; background-position: center;
             flex-shrink: 0;
         }
-        .card-info { flex: 1; min-width: 0; }
-        .card-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+        .card-info { flex: 1; min-width: 0; overflow: hidden; }
+        .card-title {
+            font-weight: 600; font-size: 14px; margin-bottom: 4px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
         .card-sub { color: #8b6ba0; font-size: 12px; }
+        
+        /* БЕГУЩАЯ СТРОКА В NOW BAR */
+        .marquee-wrap {
+            overflow: hidden; white-space: nowrap; position: relative;
+        }
+        .marquee-text {
+            display: inline-block;
+            animation: marquee 8s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
         
         .now-bar {
             position: fixed; bottom: 16px; left: 76px; right: 16px;
@@ -112,8 +128,11 @@
             background-size: cover; background-position: center;
             flex-shrink: 0;
         }
-        .now-info { flex: 1; min-width: 0; }
-        .now-title { font-weight: 600; font-size: 13px; }
+        .now-info { flex: 1; min-width: 0; overflow: hidden; }
+        .now-title {
+            font-weight: 600; font-size: 13px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
         .now-artist { color: #8b6ba0; font-size: 11px; }
         .now-controls { display: flex; gap: 10px; align-items: center; }
         .now-btn {
@@ -180,21 +199,19 @@
     <iframe id="audioFrame" style="display:none" allow="autoplay"></iframe>
 
     <script>
-        // СПИСОК ПРОКСИ-СЕРВЕРОВ (будут перебираться если один не работает)
+        const API_KEY = 'AIzaSyDW1cbsx1G-w6ogFtBI_tEvjpvk5bRuwzU';
+        
+        // Прокси для обхода блокировки
         const PROXIES = [
             'https://api.allorigins.win/raw?url=',
             'https://corsproxy.io/?',
-            'https://api.codetabs.com/v1/proxy?quest=',
-            '' // пустой = прямой запрос (если VPN включен)
+            ''
         ];
-        
-        const API_KEY = 'AIzaSyDW1cbsx1G-w6ogFtBI_tEvjpvk5bRuwzU';
         
         let tracks = [];
         let currentIndex = -1;
         let isPlaying = false;
         let progressInterval;
-        let currentProxy = 0;
         
         document.getElementById('btnMusic').addEventListener('click', ()=>{ switchTab('music'); });
         document.getElementById('btnVideo').addEventListener('click', ()=>{ switchTab('video'); });
@@ -214,19 +231,19 @@
             if (tab === 'chats') document.getElementById('btnChats').classList.add('active');
         }
         
+        // Функция для сокращения названий
+        function shortenTitle(title) {
+            if (title.length > 40) return title.substring(0, 40) + '...';
+            return title;
+        }
+        
         async function fetchWithProxy(url) {
-            // Пробуем все прокси по очереди
-            for (let i = 0; i < PROXIES.length; i++) {
+            for (let proxy of PROXIES) {
                 try {
-                    const proxyUrl = PROXIES[i] ? PROXIES[i] + encodeURIComponent(url) : url;
-                    const res = await fetch(proxyUrl);
-                    if (res.ok) {
-                        currentProxy = i;
-                        return await res.json();
-                    }
-                } catch(e) {
-                    continue;
-                }
+                    const fetchUrl = proxy ? proxy + encodeURIComponent(url) : url;
+                    const res = await fetch(fetchUrl);
+                    if (res.ok) return await res.json();
+                } catch(e) { continue; }
             }
             throw new Error('Все прокси не сработали');
         }
@@ -248,11 +265,9 @@
                         thumb: item.snippet.thumbnails.default.url
                     }));
                     renderTracks();
-                } else {
-                    document.getElementById('musicList').innerHTML = '<div style="text-align:center;color:#8b6ba0;padding:40px">Ничего не найдено</div>';
                 }
             } catch(e) {
-                document.getElementById('musicList').innerHTML = '<div style="text-align:center;color:#8b6ba0;padding:40px">Ошибка поиска. Попробуй позже</div>';
+                document.getElementById('musicList').innerHTML = '<div style="text-align:center;color:#8b6ba0;padding:40px">Ошибка. Нужен VPN или попробуй позже</div>';
             }
         }
         
@@ -270,14 +285,14 @@
                         <div class="card" onclick="playVideo('${item.id.videoId}')">
                             <div class="card-thumb" style="background-image:url('${item.snippet.thumbnails.default.url}')"></div>
                             <div class="card-info">
-                                <div class="card-title">${item.snippet.title}</div>
+                                <div class="card-title">${shortenTitle(item.snippet.title)}</div>
                                 <div class="card-sub">${item.snippet.channelTitle}</div>
                             </div>
                         </div>
                     `).join('');
                 }
             } catch(e) {
-                document.getElementById('videoList').innerHTML = '<div style="text-align:center;color:#8b6ba0;padding:40px">Ошибка поиска</div>';
+                document.getElementById('videoList').innerHTML = '<div style="text-align:center;color:#8b6ba0;padding:40px">Ошибка. Нужен VPN</div>';
             }
         }
         
@@ -286,7 +301,7 @@
                 <div class="card" onclick="playMusic(${i})">
                     <div class="card-thumb" style="background-image:url('${t.thumb}')"></div>
                     <div class="card-info">
-                        <div class="card-title">${t.title}</div>
+                        <div class="card-title">${shortenTitle(t.title)}</div>
                         <div class="card-sub">${t.artist}</div>
                     </div>
                 </div>
@@ -306,7 +321,14 @@
                 nt.textContent = '🎵';
             }
             
-            document.getElementById('nowTitle').textContent = t.title;
+            // Бегущая строка для длинных названий
+            const titleEl = document.getElementById('nowTitle');
+            if (t.title.length > 25) {
+                titleEl.innerHTML = `<div class="marquee-wrap"><div class="marquee-text">${t.title} &nbsp;&nbsp;&nbsp; ${t.title}</div></div>`;
+            } else {
+                titleEl.textContent = t.title;
+            }
+            
             document.getElementById('nowArtist').textContent = t.artist;
             document.getElementById('nowBar').classList.add('active');
             
