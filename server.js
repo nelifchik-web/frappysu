@@ -7,7 +7,6 @@ app.use(cors());
 
 const YOUTUBE_API_KEY = 'AIzaSyDW1cbsx1G-w6ogFtBI_tEvjpvk5bRuwzU';
 
-// Поиск треков
 app.get('/search', async (req, res) => {
     const q = req.query.q;
     if (!q) return res.json({ error: 'Нет запроса' });
