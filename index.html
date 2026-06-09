@@ -37,6 +37,11 @@
         .now-controls{display:flex;gap:10px;align-items:center}
         .now-btn{background:none;border:none;color:#fff;font-size:18px;cursor:pointer;padding:6px}
         .now-btn.play{width:36px;height:36px;border-radius:50%;background:#fff;color:#06030a;font-size:14px}
+        /* ВИДЕО ПЛЕЕР */
+        .video-overlay{position:fixed;inset:0;background:#000;z-index:50;display:none;flex-direction:column}
+        .video-overlay.active{display:flex}
+        .video-overlay iframe{flex:1;width:100%;border:none}
+        .video-close{position:absolute;top:16px;right:16px;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,0.6);color:#fff;border:none;font-size:20px;cursor:pointer;z-index:51;display:flex;align-items:center;justify-content:center}
     </style>
 </head>
 <body>
@@ -85,6 +90,12 @@
     </div>
 </div>
 
+<!-- ВИДЕО ПЛЕЕР -->
+<div class="video-overlay" id="videoOverlay">
+    <button class="video-close" onclick="closeVideo()">✕</button>
+    <iframe id="videoFrame" allow="autoplay; fullscreen"></iframe>
+</div>
+
 <iframe id="audioFrame" style="display:none" allow="autoplay"></iframe>
 
 <script>
@@ -96,11 +107,19 @@ document.getElementById('btnMusic').addEventListener('click',()=>{switchTab('mus
 document.getElementById('btnVideo').addEventListener('click',()=>{switchTab('video')});
 document.getElementById('btnChats').addEventListener('click',()=>{switchTab('chats')});
 document.getElementById('btnMusicSearch').addEventListener('click',searchMusic);
+document.getElementById('btnVideoSearch').addEventListener('click',searchVideo);
 document.getElementById('nowPlayBtn').addEventListener('click',togglePlay);
 document.getElementById('nowPrev').addEventListener('click',prev);
 document.getElementById('nowNext').addEventListener('click',next);
 
-function switchTab(t){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+t).classList.add('active');document.querySelectorAll('.server-icon').forEach(s=>s.classList.remove('active'));if(t==='music')document.getElementById('btnMusic').classList.add('active');if(t==='video')document.getElementById('btnVideo').classList.add('active');if(t==='chats')document.getElementById('btnChats').classList.add('active')}
+function switchTab(t){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById('screen-'+t).classList.add('active');
+    document.querySelectorAll('.server-icon').forEach(s=>s.classList.remove('active'));
+    if(t==='music')document.getElementById('btnMusic').classList.add('active');
+    if(t==='video')document.getElementById('btnVideo').classList.add('active');
+    if(t==='chats')document.getElementById('btnChats').classList.add('active');
+}
 
 async function searchMusic(){
     let q=document.getElementById('musicInput').value.trim();
@@ -114,6 +133,27 @@ async function searchMusic(){
     }catch(e){document.getElementById('musicList').innerHTML='<div style="text-align:center;color:#8b6ba0;padding:40px">Ошибка сервера</div>'}
 }
 
+async function searchVideo(){
+    let q=document.getElementById('videoInput').value.trim();
+    if(!q)return;
+    document.getElementById('videoList').innerHTML='<div style="text-align:center;color:#8b6ba0;padding:40px">Ищу...</div>';
+    try{
+        let res=await fetch(`${SERVER}/search?q=${encodeURIComponent(q)}`);
+        let data=await res.json();
+        if(Array.isArray(data) && data.length>0){
+            document.getElementById('videoList').innerHTML=data.map(i=>`
+                <div class="card" onclick="playVideo('${i.id}')">
+                    <div class="card-thumb" style="background-image:url('${i.thumb}')"></div>
+                    <div class="card-info">
+                        <div class="card-title">${i.title.length>40?i.title.substring(0,40)+'...':i.title}</div>
+                        <div class="card-sub">${i.artist}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+    }catch(e){document.getElementById('videoList').innerHTML='<div style="text-align:center;color:#8b6ba0;padding:40px">Ошибка сервера</div>'}
+}
+
 function renderTracks(){document.getElementById('musicList').innerHTML=tracks.map((t,i)=>`<div class="card" onclick="playMusic(${i})"><div class="card-thumb" style="background-image:url('${t.thumb}')"></div><div class="card-info"><div class="card-title">${t.title.length>40?t.title.substring(0,40)+'...':t.title}</div><div class="card-sub">${t.artist}</div></div></div>`).join('')}
 
 function playMusic(i){
@@ -122,20 +162,19 @@ function playMusic(i){
     document.getElementById('nowTitle').textContent=t.title;
     document.getElementById('nowArtist').textContent='Загрузка...';
     document.getElementById('nowBar').classList.add('active');
-    
-    function tryStream(){
-        document.getElementById('audioFrame').src=`${SERVER}/stream/${t.id}`;
-        setTimeout(()=>{
-            if(document.getElementById('nowArtist').textContent==='Загрузка...'){
-                document.getElementById('nowArtist').textContent='Ожидание...';
-                tryStream();
-            }
-        },3000);
-    }
-    tryStream();
-    
+    document.getElementById('audioFrame').src=`${SERVER}/stream/${t.id}`;
     isPlaying=!0;document.getElementById('nowPlayBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
     startProgress();
+}
+
+function playVideo(id){
+    document.getElementById('videoOverlay').classList.add('active');
+    document.getElementById('videoFrame').src=`https://www.youtube.com/embed/${id}?autoplay=1`;
+}
+
+function closeVideo(){
+    document.getElementById('videoOverlay').classList.remove('active');
+    document.getElementById('videoFrame').src='';
 }
 
 function togglePlay(){if(isPlaying){document.getElementById('audioFrame').src='';isPlaying=!1;document.getElementById('nowPlayBtn').innerHTML='<i class="fa-solid fa-play"></i>';clearInterval(progressInterval)}else if(currentIndex>=0)playMusic(currentIndex)}
