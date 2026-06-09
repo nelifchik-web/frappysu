@@ -40,7 +40,11 @@
             display: flex; align-items: center; justify-content: center;
             transition: all 0.25s;
         }
-        .server-icon.active { background: rgba(205,0,205,0.2); border-color: #cd00cd; color: #fff; }
+        .server-icon.active {
+            border-radius: 14px; background: rgba(205,0,205,0.2);
+            border-color: #cd00cd; color: #fff;
+            box-shadow: 0 0 15px rgba(205,0,205,0.6);
+        }
         
         .main-content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
         
@@ -71,33 +75,19 @@
             font-weight: 600; cursor: pointer;
         }
         
-        .tab-row { display: flex; gap: 8px; margin-bottom: 16px; }
-        .tab-btn {
-            padding: 8px 16px; border-radius: 20px; border: 1px solid rgba(205,0,205,0.15);
-            background: rgba(255,255,255,0.03); color: #8b6ba0;
-            font-size: 12px; font-weight: 600; cursor: pointer;
-        }
-        .tab-btn.active { background: rgba(205,0,205,0.2); border-color: #cd00cd; color: #fff; }
-        
         .card {
             display: flex; gap: 12px; padding: 12px; border-radius: 12px;
             cursor: pointer; margin-bottom: 8px;
             background: rgba(20,10,30,0.6); border: 1px solid rgba(205,0,205,0.08);
-            position: relative;
         }
         .card-thumb {
-            width: 60px; height: 60px; border-radius: 10px;
-            background-size: cover; background-position: center; flex-shrink: 0;
+            width: 50px; height: 50px; border-radius: 10px;
+            background-size: cover; background-position: center;
+            flex-shrink: 0;
         }
         .card-info { flex: 1; min-width: 0; }
         .card-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
         .card-sub { color: #8b6ba0; font-size: 12px; }
-        
-        .fav-btn {
-            background: none; border: none; color: #8b6ba0;
-            font-size: 18px; cursor: pointer; padding: 8px;
-        }
-        .fav-btn.liked { color: #ff4466; }
         
         .now-bar {
             position: fixed; bottom: 16px; left: 76px; right: 16px;
@@ -119,7 +109,8 @@
         }
         .now-thumb {
             width: 40px; height: 40px; border-radius: 10px;
-            background-size: cover; background-position: center; flex-shrink: 0;
+            background-size: cover; background-position: center;
+            flex-shrink: 0;
         }
         .now-info { flex: 1; min-width: 0; }
         .now-title { font-weight: 600; font-size: 13px; }
@@ -132,36 +123,6 @@
         .now-btn.play {
             width: 36px; height: 36px; border-radius: 50%;
             background: #fff; color: #06030a; font-size: 14px;
-        }
-        .now-btn.liked { color: #ff4466; }
-        
-        .video-overlay {
-            position: fixed; inset: 0; background: #000;
-            z-index: 50; display: none; flex-direction: column;
-        }
-        .video-overlay.active { display: flex; }
-        .video-frame-wrap {
-            flex: 1; display: flex; align-items: center; justify-content: center;
-            padding: 20px; position: relative;
-        }
-        .video-frame-wrap::before {
-            content: ''; position: absolute; inset: 12px;
-            border-radius: 24px; padding: 3px;
-            background: linear-gradient(135deg, transparent, #cd00cd, #9400d3, transparent);
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor; mask-composite: exclude;
-            animation: neonPulse 2s ease-in-out infinite; pointer-events: none; z-index: 1;
-        }
-        @keyframes neonPulse { 0%,100%{opacity:0.5} 50%{opacity:1} }
-        .video-frame-wrap iframe {
-            width: 100%; height: 100%; max-height: 70vh;
-            border-radius: 20px; border: none; position: relative; z-index: 0;
-        }
-        .close-video {
-            position: absolute; top: 20px; right: 20px;
-            width: 40px; height: 40px; border-radius: 50%;
-            background: rgba(0,0,0,0.6); color: #fff; border: none;
-            font-size: 20px; cursor: pointer; z-index: 52;
         }
     </style>
 </head>
@@ -177,24 +138,12 @@
         <div class="header"><div class="logo">FRAPPY</div></div>
 
         <div class="screen active" id="screen-music">
-            <div class="tab-row">
-                <button class="tab-btn active" id="tabSearch">Поиск</button>
-                <button class="tab-btn" id="tabFav">Избранное</button>
-                <button class="tab-btn" id="tabWave">Моя волна</button>
+            <div class="search-row">
+                <input type="text" class="search-box" placeholder="Поиск любого трека..." id="musicInput">
+                <button class="search-btn" id="btnMusicSearch">Найти</button>
             </div>
-            <div id="musicSearch">
-                <div class="search-row">
-                    <input type="text" class="search-box" placeholder="Поиск трека..." id="musicInput">
-                    <button class="search-btn" id="btnMusicSearch">Найти</button>
-                </div>
-                <div id="musicList"></div>
-            </div>
-            <div id="musicFavorites" style="display:none"><div id="favList"></div></div>
-            <div id="musicWave" style="display:none">
-                <div style="text-align:center;padding:40px">
-                    <button id="btnStartWave" style="padding:12px 24px;border-radius:20px;background:#cd00cd;color:#fff;border:none;font-weight:600;cursor:pointer">Запустить волну</button>
-                    <div id="waveTrack" style="margin-top:16px;font-weight:600"></div>
-                </div>
+            <div id="musicList">
+                <div style="text-align:center;color:#8b6ba0;padding:40px">Введи название трека и нажми "Найти"</div>
             </div>
         </div>
 
@@ -222,200 +171,181 @@
             <div class="now-artist" id="nowArtist">Нажми на трек</div>
         </div>
         <div class="now-controls">
-            <button class="now-btn" id="nowFavBtn"><i class="fa-solid fa-heart"></i></button>
             <button class="now-btn" id="nowPrev"><i class="fa-solid fa-backward-step"></i></button>
             <button class="now-btn play" id="nowPlayBtn"><i class="fa-solid fa-play"></i></button>
             <button class="now-btn" id="nowNext"><i class="fa-solid fa-forward-step"></i></button>
         </div>
     </div>
 
-    <div class="video-overlay" id="videoOverlay">
-        <button class="close-video" id="btnCloseVideo">✕</button>
-        <div class="video-frame-wrap">
-            <iframe id="videoFrame" allow="autoplay; fullscreen"></iframe>
-        </div>
-    </div>
-
     <iframe id="audioFrame" style="display:none" allow="autoplay"></iframe>
 
     <script>
+        // СПИСОК ПРОКСИ-СЕРВЕРОВ (будут перебираться если один не работает)
+        const PROXIES = [
+            'https://api.allorigins.win/raw?url=',
+            'https://corsproxy.io/?',
+            'https://api.codetabs.com/v1/proxy?quest=',
+            '' // пустой = прямой запрос (если VPN включен)
+        ];
+        
         const API_KEY = 'AIzaSyDW1cbsx1G-w6ogFtBI_tEvjpvk5bRuwzU';
         
         let tracks = [];
-        let videos = [];
         let currentIndex = -1;
         let isPlaying = false;
-        let favorites = JSON.parse(localStorage.getItem('frappy_favs') || '[]');
         let progressInterval;
-        let currentMusicTab = 'search';
+        let currentProxy = 0;
         
-        // КНОПКИ СЕРВЕРНОЙ ПАНЕЛИ
-        document.getElementById('btnMusic').onclick = function() {
+        document.getElementById('btnMusic').addEventListener('click', ()=>{ switchTab('music'); });
+        document.getElementById('btnVideo').addEventListener('click', ()=>{ switchTab('video'); });
+        document.getElementById('btnChats').addEventListener('click', ()=>{ switchTab('chats'); });
+        document.getElementById('btnMusicSearch').addEventListener('click', searchMusic);
+        document.getElementById('btnVideoSearch').addEventListener('click', searchVideo);
+        document.getElementById('nowPlayBtn').addEventListener('click', togglePlay);
+        document.getElementById('nowPrev').addEventListener('click', prev);
+        document.getElementById('nowNext').addEventListener('click', next);
+        
+        function switchTab(tab) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('screen-music').classList.add('active');
+            document.getElementById('screen-' + tab).classList.add('active');
             document.querySelectorAll('.server-icon').forEach(s => s.classList.remove('active'));
-            this.classList.add('active');
-        };
-        
-        document.getElementById('btnVideo').onclick = function() {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('screen-video').classList.add('active');
-            document.querySelectorAll('.server-icon').forEach(s => s.classList.remove('active'));
-            this.classList.add('active');
-        };
-        
-        document.getElementById('btnChats').onclick = function() {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('screen-chats').classList.add('active');
-            document.querySelectorAll('.server-icon').forEach(s => s.classList.remove('active'));
-            this.classList.add('active');
-        };
-        
-        // ВКЛАДКИ МУЗЫКИ
-        document.getElementById('tabSearch').onclick = function() { switchMusicTab('search'); };
-        document.getElementById('tabFav').onclick = function() { switchMusicTab('favorites'); };
-        document.getElementById('tabWave').onclick = function() { switchMusicTab('wave'); };
-        
-        function switchMusicTab(tab) {
-            currentMusicTab = tab;
-            document.querySelectorAll('#screen-music .tab-btn').forEach(b => b.classList.remove('active'));
-            if (tab === 'search') document.getElementById('tabSearch').classList.add('active');
-            if (tab === 'favorites') document.getElementById('tabFav').classList.add('active');
-            if (tab === 'wave') document.getElementById('tabWave').classList.add('active');
-            
-            document.getElementById('musicSearch').style.display = tab === 'search' ? 'block' : 'none';
-            document.getElementById('musicFavorites').style.display = tab === 'favorites' ? 'block' : 'none';
-            document.getElementById('musicWave').style.display = tab === 'wave' ? 'block' : 'none';
-            if (tab === 'favorites') renderFavorites();
+            if (tab === 'music') document.getElementById('btnMusic').classList.add('active');
+            if (tab === 'video') document.getElementById('btnVideo').classList.add('active');
+            if (tab === 'chats') document.getElementById('btnChats').classList.add('active');
         }
         
-        // ПОИСК МУЗЫКИ
-        document.getElementById('btnMusicSearch').onclick = searchMusic;
+        async function fetchWithProxy(url) {
+            // Пробуем все прокси по очереди
+            for (let i = 0; i < PROXIES.length; i++) {
+                try {
+                    const proxyUrl = PROXIES[i] ? PROXIES[i] + encodeURIComponent(url) : url;
+                    const res = await fetch(proxyUrl);
+                    if (res.ok) {
+                        currentProxy = i;
+                        return await res.json();
+                    }
+                } catch(e) {
+                    continue;
+                }
+            }
+            throw new Error('Все прокси не сработали');
+        }
         
         async function searchMusic() {
             const q = document.getElementById('musicInput').value.trim();
             if (!q) return;
-            document.getElementById('musicList').innerHTML = '<div style="text-align:center;padding:40px;color:#8b6ba0">Ищу...</div>';
+            document.getElementById('musicList').innerHTML = '<div style="text-align:center;color:#8b6ba0;padding:40px">Ищу...</div>';
+            
             try {
-                const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q+' music')}&type=video&maxResults=15&key=${API_KEY}`);
-                const data = await res.json();
-                if (data.items) {
-                    tracks = data.items.map(item => ({ id: item.id.videoId, title: item.snippet.title, artist: item.snippet.channelTitle, thumb: item.snippet.thumbnails.default.url }));
-                    document.getElementById('musicList').innerHTML = tracks.map((t, i) => `
-                        <div class="card" onclick="playMusic(${i})">
-                            <div class="card-thumb" style="background-image:url('${t.thumb}')"></div>
-                            <div class="card-info"><div class="card-title">${t.title}</div><div class="card-sub">🎵 ${t.artist}</div></div>
-                            <button class="fav-btn ${isFav(t.id)?'liked':''}" onclick="event.stopPropagation();toggleFav('${t.id}','${t.title.replace(/'/g,"\\'")}','${t.artist.replace(/'/g,"\\'")}','${t.thumb}')"><i class="fa-solid fa-heart"></i></button>
-                        </div>`).join('');
+                const apiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q + ' music')}&type=video&maxResults=15&key=${API_KEY}`;
+                const data = await fetchWithProxy(apiUrl);
+                
+                if (data.items && data.items.length > 0) {
+                    tracks = data.items.map(item => ({
+                        id: item.id.videoId,
+                        title: item.snippet.title,
+                        artist: item.snippet.channelTitle,
+                        thumb: item.snippet.thumbnails.default.url
+                    }));
+                    renderTracks();
+                } else {
+                    document.getElementById('musicList').innerHTML = '<div style="text-align:center;color:#8b6ba0;padding:40px">Ничего не найдено</div>';
                 }
-            } catch(e) {}
+            } catch(e) {
+                document.getElementById('musicList').innerHTML = '<div style="text-align:center;color:#8b6ba0;padding:40px">Ошибка поиска. Попробуй позже</div>';
+            }
         }
         
-        function isFav(id) { return favorites.some(f => f.id === id); }
-        
-        function toggleFav(id, title, artist, thumb) {
-            if (isFav(id)) favorites = favorites.filter(f => f.id !== id);
-            else favorites.push({ id, title, artist, thumb });
-            localStorage.setItem('frappy_favs', JSON.stringify(favorites));
-            updateNowFavBtn();
+        async function searchVideo() {
+            const q = document.getElementById('videoInput').value.trim();
+            if (!q) return;
+            document.getElementById('videoList').innerHTML = '<div style="text-align:center;color:#8b6ba0;padding:40px">Ищу...</div>';
+            
+            try {
+                const apiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&type=video&maxResults=15&key=${API_KEY}`;
+                const data = await fetchWithProxy(apiUrl);
+                
+                if (data.items && data.items.length > 0) {
+                    document.getElementById('videoList').innerHTML = data.items.map(item => `
+                        <div class="card" onclick="playVideo('${item.id.videoId}')">
+                            <div class="card-thumb" style="background-image:url('${item.snippet.thumbnails.default.url}')"></div>
+                            <div class="card-info">
+                                <div class="card-title">${item.snippet.title}</div>
+                                <div class="card-sub">${item.snippet.channelTitle}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch(e) {
+                document.getElementById('videoList').innerHTML = '<div style="text-align:center;color:#8b6ba0;padding:40px">Ошибка поиска</div>';
+            }
         }
         
-        document.getElementById('nowFavBtn').onclick = function() {
-            if (currentIndex >= 0) { const t = tracks[currentIndex]; toggleFav(t.id, t.title, t.artist, t.thumb); }
-        };
-        
-        function updateNowFavBtn() {
-            if (currentIndex >= 0) document.getElementById('nowFavBtn').classList.toggle('liked', isFav(tracks[currentIndex].id));
-        }
-        
-        function renderFavorites() {
-            if (favorites.length === 0) { document.getElementById('favList').innerHTML = '<div style="text-align:center;color:#8b6ba0;padding:40px">Нет избранных треков</div>'; return; }
-            tracks = [...favorites];
-            document.getElementById('favList').innerHTML = tracks.map((t, i) => `
+        function renderTracks() {
+            document.getElementById('musicList').innerHTML = tracks.map((t, i) => `
                 <div class="card" onclick="playMusic(${i})">
                     <div class="card-thumb" style="background-image:url('${t.thumb}')"></div>
-                    <div class="card-info"><div class="card-title">${t.title}</div><div class="card-sub">🎵 ${t.artist}</div></div>
-                </div>`).join('');
-        }
-        
-        document.getElementById('btnStartWave').onclick = startWave;
-        
-        async function startWave() {
-            document.getElementById('waveTrack').textContent = 'Подбираю...';
-            let q = 'popular music';
-            if (favorites.length > 0) { const f = favorites[Math.floor(Math.random()*favorites.length)]; q = f.artist; }
-            try {
-                const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&type=video&maxResults=5&key=${API_KEY}`);
-                const data = await res.json();
-                if (data.items?.length > 0) {
-                    const p = data.items[Math.floor(Math.random()*data.items.length)];
-                    tracks = [{ id: p.id.videoId, title: p.snippet.title, artist: p.snippet.channelTitle, thumb: p.snippet.thumbnails.default.url }];
-                    document.getElementById('waveTrack').textContent = '🎵 ' + p.snippet.title;
-                    playMusic(0);
-                }
-            } catch(e) {}
+                    <div class="card-info">
+                        <div class="card-title">${t.title}</div>
+                        <div class="card-sub">${t.artist}</div>
+                    </div>
+                </div>
+            `).join('');
         }
         
         function playMusic(index) {
             currentIndex = index;
             const t = tracks[index];
+            
             const nt = document.getElementById('nowThumb');
-            if (t.thumb?.startsWith('http')) { nt.style.backgroundImage = `url('${t.thumb}')`; nt.textContent = ''; }
-            else { nt.style.backgroundImage = ''; nt.textContent = '🎵'; }
+            if (t.thumb?.startsWith('http')) {
+                nt.style.backgroundImage = `url('${t.thumb}')`;
+                nt.textContent = '';
+            } else {
+                nt.style.backgroundImage = '';
+                nt.textContent = '🎵';
+            }
+            
             document.getElementById('nowTitle').textContent = t.title;
             document.getElementById('nowArtist').textContent = t.artist;
             document.getElementById('nowBar').classList.add('active');
-            updateNowFavBtn();
+            
             document.getElementById('audioFrame').src = `https://www.youtube.com/embed/${t.id}?autoplay=1&controls=0`;
+            
             isPlaying = true;
             document.getElementById('nowPlayBtn').innerHTML = '<i class="fa-solid fa-pause"></i>';
             startProgress();
         }
         
-        document.getElementById('nowPlayBtn').onclick = function() {
-            if (isPlaying) { document.getElementById('audioFrame').src = ''; isPlaying = false; this.innerHTML = '<i class="fa-solid fa-play"></i>'; clearInterval(progressInterval); }
-            else if (currentIndex >= 0) playMusic(currentIndex);
-        };
+        function playVideo(id) {
+            document.getElementById('audioFrame').src = `https://www.youtube.com/embed/${id}?autoplay=1&controls=1`;
+            document.getElementById('audioFrame').style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:50;display:block';
+        }
         
-        document.getElementById('nowPrev').onclick = function() { if (tracks.length) { currentIndex = (currentIndex-1+tracks.length) % tracks.length; playMusic(currentIndex); } };
-        document.getElementById('nowNext').onclick = function() { if (tracks.length) { currentIndex = (currentIndex+1) % tracks.length; playMusic(currentIndex); } };
+        function togglePlay() {
+            if (isPlaying) {
+                document.getElementById('audioFrame').src = '';
+                isPlaying = false;
+                document.getElementById('nowPlayBtn').innerHTML = '<i class="fa-solid fa-play"></i>';
+                clearInterval(progressInterval);
+            } else if (currentIndex >= 0) {
+                playMusic(currentIndex);
+            }
+        }
+        
+        function next() { if (tracks.length) { currentIndex = (currentIndex+1) % tracks.length; playMusic(currentIndex); } }
+        function prev() { if (tracks.length) { currentIndex = (currentIndex-1+tracks.length) % tracks.length; playMusic(currentIndex); } }
         
         function startProgress() {
-            clearInterval(progressInterval); let w = 0;
+            clearInterval(progressInterval);
+            let w = 0;
             document.getElementById('nowProgressFill').style.width = '0%';
-            progressInterval = setInterval(() => { w += 0.5; if (w >= 100) { w = 0; document.getElementById('nowNext').onclick(); } document.getElementById('nowProgressFill').style.width = w + '%'; }, 1000);
+            progressInterval = setInterval(() => {
+                w += 0.5;
+                if (w >= 100) { w = 0; next(); }
+                document.getElementById('nowProgressFill').style.width = w + '%';
+            }, 1000);
         }
-        
-        // ПОИСК ВИДЕО
-        document.getElementById('btnVideoSearch').onclick = searchVideo;
-        
-        async function searchVideo() {
-            const q = document.getElementById('videoInput').value.trim();
-            if (!q) return;
-            document.getElementById('videoList').innerHTML = '<div style="text-align:center;padding:40px;color:#8b6ba0">Ищу...</div>';
-            try {
-                const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&type=video&maxResults=15&key=${API_KEY}`);
-                const data = await res.json();
-                if (data.items) {
-                    videos = data.items.map(item => ({ id: item.id.videoId, title: item.snippet.title, artist: item.snippet.channelTitle, thumb: item.snippet.thumbnails.default.url }));
-                    document.getElementById('videoList').innerHTML = videos.map((v, i) => `
-                        <div class="card" onclick="playVideo(${i})">
-                            <div class="card-thumb" style="background-image:url('${v.thumb}')"></div>
-                            <div class="card-info"><div class="card-title">${v.title}</div><div class="card-sub">${v.artist}</div></div>
-                        </div>`).join('');
-                }
-            } catch(e) {}
-        }
-        
-        function playVideo(index) {
-            document.getElementById('videoOverlay').classList.add('active');
-            document.getElementById('videoFrame').src = `https://www.youtube.com/embed/${videos[index].id}?autoplay=1`;
-        }
-        
-        document.getElementById('btnCloseVideo').onclick = function() {
-            document.getElementById('videoOverlay').classList.remove('active');
-            document.getElementById('videoFrame').src = '';
-        };
     </script>
 </body>
 </html>
