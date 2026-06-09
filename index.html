@@ -35,6 +35,8 @@
             backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(205,0,205,0.1);
             display: flex; justify-content: space-between; align-items: center;
+            z-index: 30;
+            flex-shrink: 0;
         }
         .logo {
             font-size: 24px; font-weight: 800;
@@ -42,11 +44,15 @@
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
         
-        /* ЭКРАНЫ */
-        .screen { flex: 1; overflow-y: auto; padding: 20px; display: none; }
+        .nav-btn {
+            background: none; border: none; color: var(--text2);
+            font-size: 14px; cursor: pointer; padding: 6px 12px;
+            border-radius: 8px; display: flex; align-items: center; gap: 6px;
+        }
+        
+        .screen { flex: 1; overflow-y: auto; padding: 20px 20px 20px 20px; display: none; }
         .screen.active { display: block; }
         
-        /* РЕГИСТРАЦИЯ */
         .auth-box {
             max-width: 350px; margin: 40px auto;
             background: rgba(20,10,30,0.8); border-radius: 20px;
@@ -78,7 +84,6 @@
         
         .error-msg { color: #ff4466; font-size: 12px; margin-bottom: 8px; display: none; }
         
-        /* ПРОФИЛЬ */
         .profile-card {
             max-width: 350px; margin: 20px auto;
             background: rgba(20,10,30,0.8); border-radius: 20px;
@@ -94,7 +99,6 @@
         .profile-name { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
         .profile-email { color: var(--text2); font-size: 13px; margin-bottom: 16px; }
         
-        /* МУЗЫКА */
         .search-row { display: flex; gap: 8px; margin-bottom: 16px; }
         .search-box {
             flex: 1; padding: 12px 16px; border-radius: 12px;
@@ -111,71 +115,106 @@
             display: flex; align-items: center; gap: 12px;
             padding: 14px; border-radius: 12px; cursor: pointer;
             margin-bottom: 8px; background: rgba(20,10,30,0.6);
-            border: 1px solid rgba(205,0,205,0.08);
+            border: 1px solid rgba(205,0,205,0.08); position: relative;
         }
         .track-thumb {
             width: 48px; height: 48px; border-radius: 10px;
             background-size: cover; background-position: center;
+            flex-shrink: 0;
         }
-        .track-info { flex: 1; }
+        .track-info { flex: 1; min-width: 0; }
         .track-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
         .track-artist { color: var(--text2); font-size: 12px; }
         
-        /* ПЛЕЕР */
-        .player-bar {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            background: rgba(10,5,20,0.98); backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(205,0,205,0.2);
-            padding: 10px 16px; z-index: 20;
-            display: none;
+        .fav-btn {
+            background: none; border: none; color: var(--text2);
+            font-size: 18px; cursor: pointer; padding: 8px;
         }
-        .player-bar.active { display: block; }
-        .player-row { display: flex; align-items: center; gap: 12px; }
-        .player-thumb {
-            width: 42px; height: 42px; border-radius: 10px;
-            background-size: cover; background-position: center;
-        }
-        .player-info { flex: 1; }
-        .player-title { font-weight: 600; font-size: 13px; }
-        .player-artist { color: var(--text2); font-size: 11px; }
-        .player-controls { display: flex; gap: 12px; align-items: center; }
-        .p-btn { background: none; border: none; color: var(--text2); font-size: 16px; cursor: pointer; }
-        .p-btn.play { width: 40px; height: 40px; border-radius: 50%; background: #fff; color: var(--bg); }
+        .fav-btn.liked { color: #ff4466; }
         
-        .tabs { display: flex; border-bottom: 1px solid rgba(205,0,205,0.1); }
-        .tab {
-            flex: 1; padding: 14px 0; text-align: center;
-            color: var(--text2); font-size: 13px; font-weight: 600;
-            cursor: pointer; border: none; background: none;
-            border-bottom: 2px solid transparent;
+        /* NOW BAR */
+        .now-bar {
+            position: fixed; bottom: 16px; left: 16px; right: 16px;
+            background: rgba(15,5,25,0.97); backdrop-filter: blur(20px);
+            border: 1px solid rgba(205,0,205,0.2);
+            border-radius: 16px;
+            padding: 10px 14px;
+            z-index: 40;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
         }
-        .tab.active { color: var(--pink); border-bottom-color: var(--pink); }
+        .now-bar.active { display: flex; }
+        
+        .now-progress {
+            position: absolute; top: 0; left: 8px; right: 8px;
+            height: 2px; background: rgba(255,255,255,0.1);
+            border-radius: 0 0 4px 4px;
+        }
+        .now-progress-fill {
+            width: 0%; height: 100%;
+            background: linear-gradient(90deg, var(--pink), var(--purple));
+            border-radius: 0 0 4px 4px;
+            transition: width 0.5s linear;
+        }
+        
+        .now-thumb {
+            width: 40px; height: 40px; border-radius: 10px;
+            background-size: cover; background-position: center;
+            flex-shrink: 0;
+        }
+        .now-info { flex: 1; min-width: 0; }
+        .now-title { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .now-artist { color: var(--text2); font-size: 11px; }
+        
+        .now-controls { display: flex; gap: 10px; align-items: center; }
+        .now-btn {
+            background: none; border: none; color: #fff;
+            font-size: 18px; cursor: pointer; padding: 6px;
+        }
+        .now-btn.play {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: #fff; color: var(--bg); font-size: 14px;
+        }
+        .now-btn.liked { color: #ff4466; }
+        
+        .tab-row { display: flex; gap: 8px; margin-bottom: 16px; }
+        .tab-btn {
+            padding: 8px 16px; border-radius: 20px; border: 1px solid rgba(205,0,205,0.15);
+            background: rgba(255,255,255,0.03); color: var(--text2);
+            font-size: 12px; font-weight: 600; cursor: pointer;
+        }
+        .tab-btn.active { background: rgba(205,0,205,0.2); border-color: var(--pink); color: #fff; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div class="logo">FRAPPY</div>
+        <div style="display:flex;align-items:center;gap:8px">
+            <button class="nav-btn" id="btnBackProfile" onclick="showScreen('music')" style="display:none"><i class="fa-solid fa-arrow-left"></i> Назад</button>
+            <button class="nav-btn" id="btnBackMusic" onclick="showScreen('profile')" style="display:none"><i class="fa-solid fa-arrow-left"></i> Профиль</button>
+            <div class="logo">FRAPPY</div>
+        </div>
         <div style="display:flex;gap:8px">
-            <button class="tab" id="tabLogin" onclick="showScreen('login')" style="color:var(--text2);border:none;background:none;cursor:pointer;font-size:13px">Войти</button>
-            <button class="tab" id="tabProfile" onclick="showScreen('profile')" style="color:var(--text2);border:none;background:none;cursor:pointer;font-size:13px;display:none">Профиль</button>
+            <span id="tabProfile" style="color:var(--text2);font-size:13px;cursor:pointer;display:none" onclick="showScreen('profile')">Профиль</span>
+            <span id="tabLogin" style="color:var(--text2);font-size:13px;cursor:pointer" onclick="showScreen('login')">Войти</span>
         </div>
     </div>
 
-    <!-- ЭКРАН ВХОДА -->
+    <!-- ЭКРАНЫ -->
     <div class="screen active" id="screen-login">
         <div class="auth-box">
             <h2>Frappy</h2>
             <p>Войди или создай аккаунт</p>
             <input type="text" class="input-field" placeholder="Имя пользователя" id="loginName">
             <input type="password" class="input-field" placeholder="Пароль" id="loginPass">
-            <div class="error-msg" id="loginError">Неверное имя или пароль</div>
+            <div class="error-msg" id="loginError"></div>
             <button class="btn btn-primary" onclick="login()">Войти</button>
             <button class="btn btn-secondary" onclick="register()">Создать аккаунт</button>
         </div>
     </div>
 
-    <!-- ЭКРАН ПРОФИЛЯ -->
     <div class="screen" id="screen-profile">
         <div class="profile-card">
             <div class="profile-avatar" id="profileAvatar">👤</div>
@@ -185,30 +224,51 @@
         </div>
     </div>
 
-    <!-- ЭКРАН МУЗЫКИ -->
     <div class="screen" id="screen-music">
-        <div class="search-row" style="padding:20px 20px 0 20px">
-            <input type="text" class="search-box" placeholder="Поиск трека..." id="searchInput">
-            <button class="search-btn" onclick="search()">Найти</button>
+        <div class="tab-row">
+            <button class="tab-btn active" onclick="switchTab('search')">Поиск</button>
+            <button class="tab-btn" onclick="switchTab('favorites')">Избранное</button>
+            <button class="tab-btn" onclick="switchTab('wave')">Моя волна</button>
         </div>
-        <div id="trackList" style="padding:0 20px"></div>
+        
+        <div id="tabSearch">
+            <div class="search-row">
+                <input type="text" class="search-box" placeholder="Поиск трека..." id="searchInput">
+                <button class="search-btn" onclick="search()">Найти</button>
+            </div>
+            <div id="trackList"></div>
+        </div>
+        
+        <div id="tabFavorites" style="display:none">
+            <div id="favList"></div>
+        </div>
+        
+        <div id="tabWave" style="display:none">
+            <div style="text-align:center;padding:40px">
+                <div style="color:var(--text2);margin-bottom:16px">Бесконечный поток под твой вкус</div>
+                <button onclick="startWave()" style="padding:12px 24px;border-radius:20px;background:var(--pink);color:#fff;border:none;font-weight:600;cursor:pointer;font-size:14px">Запустить волну</button>
+                <div id="waveTrack" style="margin-top:16px;font-weight:600"></div>
+            </div>
+        </div>
     </div>
 
-    <!-- ПЛЕЕР -->
-    <div class="player-bar" id="playerBar">
-        <div class="player-row">
-            <div class="player-thumb" id="playerThumb">🎵</div>
-            <div class="player-info">
-                <div class="player-title" id="playerTitle">Выбери трек</div>
-                <div class="player-artist" id="playerArtist">Нажми на трек</div>
-            </div>
-            <div class="player-controls">
-                <button class="p-btn" onclick="prev()"><i class="fa-solid fa-backward-step"></i></button>
-                <button class="p-btn play" id="playBtn" onclick="togglePlay()"><i class="fa-solid fa-play"></i></button>
-                <button class="p-btn" onclick="next()"><i class="fa-solid fa-forward-step"></i></button>
-            </div>
+    <!-- NOW BAR -->
+    <div class="now-bar" id="nowBar">
+        <div class="now-progress"><div class="now-progress-fill" id="nowProgressFill"></div></div>
+        <div class="now-thumb" id="nowThumb">🎵</div>
+        <div class="now-info">
+            <div class="now-title" id="nowTitle">Выбери трек</div>
+            <div class="now-artist" id="nowArtist">Нажми на трек</div>
+        </div>
+        <div class="now-controls">
+            <button class="now-btn" id="nowFavBtn" onclick="toggleFavCurrent()"><i class="fa-solid fa-heart"></i></button>
+            <button class="now-btn" onclick="prev()"><i class="fa-solid fa-backward-step"></i></button>
+            <button class="now-btn play" id="nowPlayBtn" onclick="togglePlay()"><i class="fa-solid fa-play"></i></button>
+            <button class="now-btn" onclick="next()"><i class="fa-solid fa-forward-step"></i></button>
         </div>
     </div>
+
+    <iframe id="ytFrame" style="display:none" allow="autoplay"></iframe>
 
     <script>
         const API_KEY = 'AIzaSyDW1cbsx1G-w6ogFtBI_tEvjpvk5bRuwzU';
@@ -218,59 +278,57 @@
         let isPlaying = false;
         let currentUser = JSON.parse(localStorage.getItem('frappy_user') || 'null');
         let users = JSON.parse(localStorage.getItem('frappy_users') || '{}');
+        let favorites = JSON.parse(localStorage.getItem('frappy_favs') || '[]');
+        let progressInterval;
+        let currentTab = 'search';
         
-        // Показать экран
         function showScreen(screen) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('screen-' + screen).classList.add('active');
+            document.getElementById('btnBackProfile').style.display = screen === 'profile' ? 'flex' : 'none';
+            document.getElementById('btnBackMusic').style.display = screen === 'music' ? 'flex' : 'none';
             
             if (screen === 'profile') {
-                document.getElementById('profileName').textContent = currentUser.name;
-                document.getElementById('profileEmail').textContent = currentUser.name + '@frappy.app';
-                document.getElementById('profileAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+                document.getElementById('profileName').textContent = currentUser?.name || '';
+                document.getElementById('profileEmail').textContent = (currentUser?.name || 'user') + '@frappy.app';
+                document.getElementById('profileAvatar').textContent = (currentUser?.name || 'U').charAt(0).toUpperCase();
             }
+            if (screen === 'music' && currentTab === 'favorites') renderFavorites();
         }
         
-        // Регистрация
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('tabSearch').style.display = tab === 'search' ? 'block' : 'none';
+            document.getElementById('tabFavorites').style.display = tab === 'favorites' ? 'block' : 'none';
+            document.getElementById('tabWave').style.display = tab === 'wave' ? 'block' : 'none';
+            if (tab === 'favorites') renderFavorites();
+        }
+        
         function register() {
             const name = document.getElementById('loginName').value.trim();
             const pass = document.getElementById('loginPass').value.trim();
-            
-            if (!name || !pass) {
-                document.getElementById('loginError').style.display = 'block';
-                document.getElementById('loginError').textContent = 'Заполни все поля';
-                return;
-            }
-            
-            if (users[name]) {
-                document.getElementById('loginError').style.display = 'block';
-                document.getElementById('loginError').textContent = 'Пользователь уже существует';
-                return;
-            }
-            
-            users[name] = { name, pass, createdAt: new Date().toISOString() };
+            if (!name || !pass) { showError('Заполни все поля'); return; }
+            if (users[name]) { showError('Пользователь уже существует'); return; }
+            users[name] = { name, pass };
             localStorage.setItem('frappy_users', JSON.stringify(users));
-            
             currentUser = { name, pass };
             localStorage.setItem('frappy_user', JSON.stringify(currentUser));
-            
             afterLogin();
         }
         
-        // Вход
         function login() {
             const name = document.getElementById('loginName').value.trim();
             const pass = document.getElementById('loginPass').value.trim();
-            
             if (users[name] && users[name].pass === pass) {
                 currentUser = { name, pass };
                 localStorage.setItem('frappy_user', JSON.stringify(currentUser));
                 afterLogin();
-            } else {
-                document.getElementById('loginError').style.display = 'block';
-                document.getElementById('loginError').textContent = 'Неверное имя или пароль';
-            }
+            } else { showError('Неверное имя или пароль'); }
         }
+        
+        function showError(msg) { const el = document.getElementById('loginError'); el.style.display = 'block'; el.textContent = msg; }
         
         function afterLogin() {
             document.getElementById('tabLogin').style.display = 'none';
@@ -288,7 +346,6 @@
             document.getElementById('loginPass').value = '';
         }
         
-        // Поиск музыки
         async function search() {
             const q = document.getElementById('searchInput').value.trim();
             if (!q) return;
@@ -303,71 +360,76 @@
                         artist: item.snippet.channelTitle,
                         thumb: item.snippet.thumbnails.default.url
                     }));
-                    renderTracks();
+                    renderTrackList(tracks, 'trackList');
                 }
             } catch(e) {}
         }
         
-        function renderTracks() {
-            document.getElementById('trackList').innerHTML = tracks.map((t, i) => `
+        function renderTrackList(list, containerId) {
+            document.getElementById(containerId).innerHTML = list.map((t, i) => `
                 <div class="track-card" onclick="play(${i})">
                     <div class="track-thumb" style="background-image:url('${t.thumb}')"></div>
                     <div class="track-info">
                         <div class="track-title">${t.title}</div>
                         <div class="track-artist">${t.artist}</div>
                     </div>
+                    <button class="fav-btn ${isFav(t.id) ? 'liked' : ''}" onclick="event.stopPropagation();toggleFav('${t.id}','${t.title.replace(/'/g,"\\'")}','${t.artist.replace(/'/g,"\\'")}','${t.thumb}')">
+                        <i class="fa-solid fa-heart"></i>
+                    </button>
                 </div>
             `).join('');
         }
         
-        function play(index) {
-            currentIndex = index;
-            const t = tracks[index];
-            
-            const pt = document.getElementById('playerThumb');
-            if (t.thumb && t.thumb.startsWith('http')) {
-                pt.style.backgroundImage = `url('${t.thumb}')`;
-                pt.textContent = '';
+        function isFav(id) { return favorites.some(f => f.id === id); }
+        
+        function toggleFav(id, title, artist, thumb) {
+            if (isFav(id)) {
+                favorites = favorites.filter(f => f.id !== id);
             } else {
-                pt.style.backgroundImage = '';
-                pt.textContent = '🎵';
+                favorites.push({ id, title, artist, thumb });
             }
-            
-            document.getElementById('playerTitle').textContent = t.title;
-            document.getElementById('playerArtist').textContent = t.artist;
-            document.getElementById('playerBar').classList.add('active');
-            
-            const old = document.getElementById('yt');
-            if (old) old.remove();
-            
-            const c = document.createElement('div');
-            c.id = 'yt';
-            c.style.cssText = 'position:fixed;bottom:0;left:0;width:1px;height:1px;opacity:0';
-            document.body.appendChild(c);
-            c.innerHTML = `<iframe width="1" height="1" src="https://www.youtube.com/embed/${t.id}?autoplay=1" allow="autoplay"></iframe>`;
-            
-            isPlaying = true;
-            document.getElementById('playBtn').innerHTML = '<i class="fa-solid fa-pause"></i>';
+            localStorage.setItem('frappy_favs', JSON.stringify(favorites));
+            if (currentTab === 'search') renderTrackList(tracks, 'trackList');
+            if (currentTab === 'favorites') renderFavorites();
+            updateNowFavBtn();
         }
         
-        function togglePlay() {
-            if (isPlaying) {
-                const old = document.getElementById('yt');
-                if (old) old.remove();
-                isPlaying = false;
-                document.getElementById('playBtn').innerHTML = '<i class="fa-solid fa-play"></i>';
-            } else if (currentIndex >= 0) {
-                play(currentIndex);
+        function toggleFavCurrent() {
+            if (currentIndex >= 0) {
+                const t = tracks[currentIndex];
+                toggleFav(t.id, t.title, t.artist, t.thumb);
             }
         }
         
-        function next() { if (tracks.length) { currentIndex = (currentIndex + 1) % tracks.length; play(currentIndex); } }
-        function prev() { if (tracks.length) { currentIndex = (currentIndex - 1 + tracks.length) % tracks.length; play(currentIndex); } }
-        
-        // Старт
-        if (currentUser) {
-            afterLogin();
+        function updateNowFavBtn() {
+            if (currentIndex >= 0) {
+                const btn = document.getElementById('nowFavBtn');
+                if (isFav(tracks[currentIndex].id)) {
+                    btn.classList.add('liked');
+                } else {
+                    btn.classList.remove('liked');
+                }
+            }
         }
-    </script>
-</body>
-</html>
+        
+        function renderFavorites() {
+            if (favorites.length === 0) {
+                document.getElementById('favList').innerHTML = '<div style="text-align:center;color:var(--text2);padding:40px">Нет избранных треков</div>';
+                return;
+            }
+            tracks = [...favorites];
+            renderTrackList(favorites, 'favList');
+        }
+        
+        async function startWave() {
+            document.getElementById('waveTrack').textContent = 'Подбираю трек...';
+            let query = 'popular music';
+            if (favorites.length > 0) {
+                const fav = favorites[Math.floor(Math.random() * favorites.length)];
+                query = fav.artist + ' ' + fav.title.split(' ').slice(0, 2).join(' ');
+            }
+            try {
+                const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=5&key=${API_KEY}`);
+                const data = await res.json();
+                if (data.items && data.items.length > 0) {
+                    const pick = data.items[Math.floor(Math.random() * data.items.length)
