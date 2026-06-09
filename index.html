@@ -28,7 +28,6 @@
             overflow: hidden;
         }
         
-        /* СЕРВЕРНАЯ ПАНЕЛЬ */
         .server-bar {
             width: 60px; background: rgba(5,2,10,0.95); backdrop-filter: blur(20px);
             display: flex; flex-direction: column; align-items: center;
@@ -62,7 +61,7 @@
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
         
-        .screen { flex: 1; overflow-y: auto; padding: 20px; display: none; }
+        .screen { flex: 1; overflow-y: auto; padding: 20px 20px 100px 20px; display: none; }
         .screen.active { display: block; }
         
         .search-row { display: flex; gap: 8px; margin-bottom: 16px; }
@@ -77,19 +76,63 @@
             font-weight: 600; cursor: pointer;
         }
         
-        .video-card {
+        .card {
             display: flex; gap: 12px; padding: 12px;
             border-radius: 12px; cursor: pointer; margin-bottom: 8px;
             background: rgba(20,10,30,0.6); border: 1px solid rgba(205,0,205,0.08);
         }
-        .video-thumb {
-            width: 120px; height: 68px; border-radius: 8px;
+        .card-thumb {
+            width: 60px; height: 60px; border-radius: 10px;
             background-size: cover; background-position: center;
             flex-shrink: 0;
         }
-        .video-info { flex: 1; }
-        .video-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
-        .video-channel { color: #8b6ba0; font-size: 12px; }
+        .card-info { flex: 1; }
+        .card-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+        .card-sub { color: #8b6ba0; font-size: 12px; }
+        
+        /* NOW BAR */
+        .now-bar {
+            position: fixed; bottom: 16px; left: 76px; right: 16px;
+            background: rgba(15,5,25,0.97); backdrop-filter: blur(20px);
+            border: 1px solid rgba(205,0,205,0.2);
+            border-radius: 16px;
+            padding: 10px 14px;
+            z-index: 40;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+        .now-bar.active { display: flex; }
+        
+        .now-progress {
+            position: absolute; top: 0; left: 8px; right: 8px;
+            height: 2px; background: rgba(255,255,255,0.1);
+            border-radius: 0 0 4px 4px;
+        }
+        .now-progress-fill {
+            width: 0%; height: 100%;
+            background: linear-gradient(90deg, #cd00cd, #9400d3);
+            border-radius: 0 0 4px 4px;
+            transition: width 0.5s linear;
+        }
+        
+        .now-thumb {
+            width: 40px; height: 40px; border-radius: 10px;
+            background-size: cover; background-position: center;
+            flex-shrink: 0;
+        }
+        .now-info { flex: 1; min-width: 0; }
+        .now-title { font-weight: 600; font-size: 13px; }
+        .now-artist { color: #8b6ba0; font-size: 11px; }
+        .now-controls { display: flex; gap: 10px; align-items: center; }
+        .now-btn {
+            background: none; border: none; color: #fff;
+            font-size: 18px; cursor: pointer; padding: 6px;
+        }
+        .now-btn.play {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: #fff; color: #06030a; font-size: 14px;
+        }
         
         /* ВИДЕО-ПЛЕЕР */
         .video-overlay {
@@ -97,9 +140,7 @@
             z-index: 50; display: none;
         }
         .video-overlay.active { display: flex; flex-direction: column; }
-        .video-overlay iframe {
-            flex: 1; width: 100%; border: none;
-        }
+        .video-overlay iframe { flex: 1; width: 100%; border: none; }
         .close-video {
             position: absolute; top: 16px; right: 16px;
             width: 40px; height: 40px; border-radius: 50%;
@@ -110,20 +151,15 @@
 </head>
 <body>
 
-    <!-- СЕРВЕРНАЯ ПАНЕЛЬ -->
     <div class="server-bar">
         <button class="server-icon active" onclick="switchTab('music')"><i class="fa-solid fa-headphones"></i></button>
         <button class="server-icon" onclick="switchTab('video')"><i class="fa-solid fa-film"></i></button>
         <button class="server-icon" onclick="switchTab('chats')"><i class="fa-solid fa-message"></i></button>
     </div>
 
-    <!-- ОСНОВНОЙ КОНТЕНТ -->
     <div class="main-content">
-        <div class="header">
-            <div class="logo">FRAPPY</div>
-        </div>
+        <div class="header"><div class="logo">FRAPPY</div></div>
 
-        <!-- МУЗЫКА -->
         <div class="screen active" id="screen-music">
             <div class="search-row">
                 <input type="text" class="search-box" placeholder="Поиск трека..." id="musicSearch">
@@ -132,7 +168,6 @@
             <div id="musicList"></div>
         </div>
 
-        <!-- ВИДЕО -->
         <div class="screen" id="screen-video">
             <div class="search-row">
                 <input type="text" class="search-box" placeholder="Поиск видео..." id="videoSearch">
@@ -141,12 +176,26 @@
             <div id="videoList"></div>
         </div>
 
-        <!-- ЧАТЫ -->
         <div class="screen" id="screen-chats">
             <div style="text-align:center;color:#8b6ba0;padding:40px">
                 <i class="fa-solid fa-message" style="font-size:48px;color:#cd00cd;margin-bottom:12px"></i>
                 <div>Чаты скоро будут</div>
             </div>
+        </div>
+    </div>
+
+    <!-- NOW BAR -->
+    <div class="now-bar" id="nowBar">
+        <div class="now-progress"><div class="now-progress-fill" id="nowProgressFill"></div></div>
+        <div class="now-thumb" id="nowThumb">🎵</div>
+        <div class="now-info">
+            <div class="now-title" id="nowTitle">Выбери трек</div>
+            <div class="now-artist" id="nowArtist">Нажми на трек</div>
+        </div>
+        <div class="now-controls">
+            <button class="now-btn" onclick="prev()"><i class="fa-solid fa-backward-step"></i></button>
+            <button class="now-btn play" id="nowPlayBtn" onclick="togglePlay()"><i class="fa-solid fa-play"></i></button>
+            <button class="now-btn" onclick="next()"><i class="fa-solid fa-forward-step"></i></button>
         </div>
     </div>
 
@@ -156,11 +205,15 @@
         <iframe id="videoFrame" allow="autoplay; fullscreen"></iframe>
     </div>
 
-    <!-- СКРЫТЫЙ АУДИО -->
     <iframe id="audioFrame" style="display:none" allow="autoplay"></iframe>
 
     <script>
-        const API_KEY = 'AIzaSyDW1cbsx1G-w6ogFtBI_tEvjpvk5bRuwzU';
+        const API_KEY = 'ВСТАВЬ_СВОЙ_КЛЮЧ_СЮДА';
+        
+        let tracks = [];
+        let currentIndex = -1;
+        let isPlaying = false;
+        let progressInterval;
         
         function switchTab(tab) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -173,7 +226,6 @@
             });
         }
         
-        // ПОИСК МУЗЫКИ
         async function searchMusic() {
             const q = document.getElementById('musicSearch').value.trim();
             if (!q) return;
@@ -182,12 +234,16 @@
                 const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q + ' music')}&type=video&maxResults=15&key=${API_KEY}`);
                 const data = await res.json();
                 if (data.items) {
-                    document.getElementById('musicList').innerHTML = data.items.map((item, i) => `
-                        <div class="video-card" onclick="playMusic('${item.id.videoId}','${item.snippet.title.replace(/'/g,"\\'")}','${item.snippet.channelTitle.replace(/'/g,"\\'")}','${item.snippet.thumbnails.default.url}')">
-                            <div class="video-thumb" style="background-image:url('${item.snippet.thumbnails.default.url}')"></div>
-                            <div class="video-info">
-                                <div class="video-title">${item.snippet.title}</div>
-                                <div class="video-channel">🎵 ${item.snippet.channelTitle}</div>
+                    tracks = data.items.map(item => ({
+                        id: item.id.videoId, title: item.snippet.title,
+                        artist: item.snippet.channelTitle, thumb: item.snippet.thumbnails.default.url
+                    }));
+                    document.getElementById('musicList').innerHTML = tracks.map((t, i) => `
+                        <div class="card" onclick="playMusic(${i})">
+                            <div class="card-thumb" style="background-image:url('${t.thumb}')"></div>
+                            <div class="card-info">
+                                <div class="card-title">${t.title}</div>
+                                <div class="card-sub">🎵 ${t.artist}</div>
                             </div>
                         </div>
                     `).join('');
@@ -195,17 +251,55 @@
             } catch(e) {}
         }
         
-        function playMusic(id, title, artist, thumb) {
-            document.getElementById('audioFrame').src = `https://www.youtube.com/embed/${id}?autoplay=1&controls=0`;
-            // Мини-уведомление
-            const toast = document.createElement('div');
-            toast.style.cssText = 'position:fixed;bottom:20px;left:76px;right:20px;background:rgba(15,5,25,0.97);border:1px solid rgba(205,0,205,0.2);border-radius:16px;padding:10px 14px;z-index:40;display:flex;align-items:center;gap:10px';
-            toast.innerHTML = `<div style="width:40px;height:40px;border-radius:10px;background-image:url('${thumb}');background-size:cover"></div><div style="flex:1"><div style="font-weight:600;font-size:13px">${title}</div><div style="color:#8b6ba0;font-size:11px">${artist}</div></div>`;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 5000);
+        function playMusic(index) {
+            currentIndex = index;
+            const t = tracks[index];
+            
+            // NOW BAR
+            const nt = document.getElementById('nowThumb');
+            if (t.thumb && t.thumb.startsWith('http')) {
+                nt.style.backgroundImage = `url('${t.thumb}')`;
+                nt.textContent = '';
+            } else {
+                nt.style.backgroundImage = '';
+                nt.textContent = '🎵';
+            }
+            document.getElementById('nowTitle').textContent = t.title;
+            document.getElementById('nowArtist').textContent = t.artist;
+            document.getElementById('nowBar').classList.add('active');
+            
+            document.getElementById('audioFrame').src = `https://www.youtube.com/embed/${t.id}?autoplay=1&controls=0`;
+            
+            isPlaying = true;
+            document.getElementById('nowPlayBtn').innerHTML = '<i class="fa-solid fa-pause"></i>';
+            startProgress();
         }
         
-        // ПОИСК ВИДЕО
+        function togglePlay() {
+            if (isPlaying) {
+                document.getElementById('audioFrame').src = '';
+                isPlaying = false;
+                document.getElementById('nowPlayBtn').innerHTML = '<i class="fa-solid fa-play"></i>';
+                clearInterval(progressInterval);
+            } else if (currentIndex >= 0) {
+                playMusic(currentIndex);
+            }
+        }
+        
+        function next() { if (tracks.length) { currentIndex = (currentIndex + 1) % tracks.length; playMusic(currentIndex); } }
+        function prev() { if (tracks.length) { currentIndex = (currentIndex - 1 + tracks.length) % tracks.length; playMusic(currentIndex); } }
+        
+        function startProgress() {
+            clearInterval(progressInterval);
+            let w = 0;
+            document.getElementById('nowProgressFill').style.width = '0%';
+            progressInterval = setInterval(() => {
+                w += 0.5;
+                if (w >= 100) { w = 0; next(); }
+                document.getElementById('nowProgressFill').style.width = w + '%';
+            }, 1000);
+        }
+        
         async function searchVideo() {
             const q = document.getElementById('videoSearch').value.trim();
             if (!q) return;
@@ -215,11 +309,11 @@
                 const data = await res.json();
                 if (data.items) {
                     document.getElementById('videoList').innerHTML = data.items.map(item => `
-                        <div class="video-card" onclick="playVideo('${item.id.videoId}')">
-                            <div class="video-thumb" style="background-image:url('${item.snippet.thumbnails.default.url}')"></div>
-                            <div class="video-info">
-                                <div class="video-title">${item.snippet.title}</div>
-                                <div class="video-channel">${item.snippet.channelTitle}</div>
+                        <div class="card" onclick="playVideo('${item.id.videoId}')">
+                            <div class="card-thumb" style="background-image:url('${item.snippet.thumbnails.default.url}')"></div>
+                            <div class="card-info">
+                                <div class="card-title">${item.snippet.title}</div>
+                                <div class="card-sub">${item.snippet.channelTitle}</div>
                             </div>
                         </div>
                     `).join('');
