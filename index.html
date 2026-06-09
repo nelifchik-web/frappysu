@@ -16,7 +16,6 @@
             --bg: #06030a;
             --text: #e8d5f5;
             --text2: #8b6ba0;
-            --radius: 16px;
         }
         
         body {
@@ -159,7 +158,7 @@
             background: linear-gradient(135deg, transparent, #cd00cd, #9400d3, transparent);
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor; mask-composite: exclude;
-            animation: neonPulse 2s ease-in-out infinite; pointer-events: none;
+            animation: neonPulse 2s ease-in-out infinite; pointer-events: none; z-index: 1;
         }
         @keyframes neonPulse {
             0%,100%{opacity:0.5} 50%{opacity:1}
@@ -167,7 +166,7 @@
         
         .video-frame-wrap iframe {
             width: 100%; height: 100%; max-height: 70vh;
-            border-radius: 20px; border: none;
+            border-radius: 20px; border: none; position: relative; z-index: 0;
         }
         
         .video-controls {
@@ -285,7 +284,6 @@
         let currentIndex = -1;
         let currentVideoIndex = -1;
         let isPlaying = false;
-        let isVideoPlaying = true;
         let favorites = JSON.parse(localStorage.getItem('frappy_favs') || '[]');
         let progressInterval;
         let currentMusicTab = 'search';
@@ -309,7 +307,6 @@
             if (tab === 'favorites') renderFavorites();
         }
         
-        // МУЗЫКА
         async function searchMusic() {
             const q = document.getElementById('musicInput').value.trim();
             if (!q) return;
@@ -344,32 +341,19 @@
             updateNowFavBtn();
         }
         
-        function toggleFavCurrent() {
-            if (currentIndex >= 0) { const t = tracks[currentIndex]; toggleFav(t.id, t.title, t.artist, t.thumb); }
-        }
+        function toggleFavCurrent() { if (currentIndex >= 0) { const t = tracks[currentIndex]; toggleFav(t.id, t.title, t.artist, t.thumb); } }
         
-        function updateNowFavBtn() {
-            if (currentIndex >= 0) {
-                document.getElementById('nowFavBtn').classList.toggle('liked', isFav(tracks[currentIndex].id));
-            }
-        }
+        function updateNowFavBtn() { if (currentIndex >= 0) document.getElementById('nowFavBtn').classList.toggle('liked', isFav(tracks[currentIndex].id)); }
         
         function renderFavorites() {
-            if (favorites.length === 0) {
-                document.getElementById('favList').innerHTML = '<div style="text-align:center;color:#8b6ba0;padding:40px">Нет избранных треков</div>';
-                return;
-            }
-            tracks = [...favorites];
-            renderMusicList(favorites, 'favList');
+            if (favorites.length === 0) { document.getElementById('favList').innerHTML = '<div style="text-align:center;color:#8b6ba0;padding:40px">Нет избранных треков</div>'; return; }
+            tracks = [...favorites]; renderMusicList(favorites, 'favList');
         }
         
         async function startWave() {
             document.getElementById('waveTrack').textContent = 'Подбираю...';
             let q = 'popular music';
-            if (favorites.length > 0) {
-                const f = favorites[Math.floor(Math.random()*favorites.length)];
-                q = f.artist + ' ' + f.title.split(' ').slice(0,2).join(' ');
-            }
+            if (favorites.length > 0) { const f = favorites[Math.floor(Math.random()*favorites.length)]; q = f.artist + ' ' + f.title.split(' ').slice(0,2).join(' '); }
             try {
                 const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&type=video&maxResults=5&key=${API_KEY}`);
                 const data = await res.json();
@@ -399,19 +383,15 @@
         }
         
         function togglePlay() {
-            if (isPlaying) {
-                document.getElementById('audioFrame').src = ''; isPlaying = false;
-                document.getElementById('nowPlayBtn').innerHTML = '<i class="fa-solid fa-play"></i>';
-                clearInterval(progressInterval);
-            } else if (currentIndex >= 0) playMusic(currentIndex);
+            if (isPlaying) { document.getElementById('audioFrame').src = ''; isPlaying = false; document.getElementById('nowPlayBtn').innerHTML = '<i class="fa-solid fa-play"></i>'; clearInterval(progressInterval); }
+            else if (currentIndex >= 0) playMusic(currentIndex);
         }
         
         function next() { if (tracks.length) { currentIndex = (currentIndex+1) % tracks.length; playMusic(currentIndex); } }
         function prev() { if (tracks.length) { currentIndex = (currentIndex-1+tracks.length) % tracks.length; playMusic(currentIndex); } }
         
         function startProgress() {
-            clearInterval(progressInterval);
-            let w = 0;
+            clearInterval(progressInterval); let w = 0;
             document.getElementById('nowProgressFill').style.width = '0%';
             progressInterval = setInterval(() => { w += 0.5; if (w >= 100) { w = 0; next(); } document.getElementById('nowProgressFill').style.width = w + '%'; }, 1000);
         }
@@ -422,3 +402,7 @@
             if (!q) return;
             document.getElementById('videoList').innerHTML = '<div style="text-align:center;color:#8b6ba0;padding:40px">Ищу...</div>';
             try {
+                const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&type=video&maxResults=15&key=${API_KEY}`);
+                const data = await res.json();
+                if (data.items) {
+                   
