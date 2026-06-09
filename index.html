@@ -37,7 +37,6 @@
         .now-controls{display:flex;gap:10px;align-items:center}
         .now-btn{background:none;border:none;color:#fff;font-size:18px;cursor:pointer;padding:6px}
         .now-btn.play{width:36px;height:36px;border-radius:50%;background:#fff;color:#06030a;font-size:14px}
-        /* ВИДЕО ПЛЕЕР */
         .video-overlay{position:fixed;inset:0;background:#000;z-index:50;display:none;flex-direction:column}
         .video-overlay.active{display:flex}
         .video-overlay iframe{flex:1;width:100%;border:none}
@@ -90,18 +89,18 @@
     </div>
 </div>
 
-<!-- ВИДЕО ПЛЕЕР -->
 <div class="video-overlay" id="videoOverlay">
     <button class="video-close" onclick="closeVideo()">✕</button>
     <iframe id="videoFrame" allow="autoplay; fullscreen"></iframe>
 </div>
 
-<iframe id="audioFrame" style="display:none" allow="autoplay"></iframe>
+<audio id="audioPlayer" style="display:none"></audio>
 
 <script>
 const SERVER = 'https://frappy-server.onrender.com';
 
 let tracks=[],currentIndex=-1,isPlaying=!1,progressInterval;
+let audio = document.getElementById('audioPlayer');
 
 document.getElementById('btnMusic').addEventListener('click',()=>{switchTab('music')});
 document.getElementById('btnVideo').addEventListener('click',()=>{switchTab('video')});
@@ -162,14 +161,27 @@ function playMusic(i){
     document.getElementById('nowTitle').textContent=t.title;
     document.getElementById('nowArtist').textContent='Загрузка...';
     document.getElementById('nowBar').classList.add('active');
-    document.getElementById('audioFrame').src=`${SERVER}/stream/${t.id}`;
+    
+    // Играем через Audio элемент (сервер стримит mp3)
+    audio.src = `${SERVER}/stream/${t.id}`;
+    audio.play().catch(() => {
+        document.getElementById('nowArtist').textContent = 'Нажми Play';
+    });
+    
+    audio.onplaying = () => { document.getElementById('nowArtist').textContent = t.artist; };
+    
     isPlaying=!0;document.getElementById('nowPlayBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
     startProgress();
 }
 
 function playVideo(id){
     document.getElementById('videoOverlay').classList.add('active');
-    document.getElementById('videoFrame').src=`https://www.youtube.com/embed/${id}?autoplay=1`;
+    // Используем того же сервера для видео (или прямой YouTube если VPN включен)
+    document.getElementById('videoFrame').src=`${SERVER}/stream/${id}`;
+    // Фолбэк на YouTube
+    setTimeout(() => {
+        document.getElementById('videoFrame').src=`https://www.youtube.com/embed/${id}?autoplay=1`;
+    }, 2000);
 }
 
 function closeVideo(){
@@ -177,7 +189,10 @@ function closeVideo(){
     document.getElementById('videoFrame').src='';
 }
 
-function togglePlay(){if(isPlaying){document.getElementById('audioFrame').src='';isPlaying=!1;document.getElementById('nowPlayBtn').innerHTML='<i class="fa-solid fa-play"></i>';clearInterval(progressInterval)}else if(currentIndex>=0)playMusic(currentIndex)}
+function togglePlay(){
+    if(isPlaying){audio.pause();isPlaying=!1;document.getElementById('nowPlayBtn').innerHTML='<i class="fa-solid fa-play"></i>';clearInterval(progressInterval)}
+    else if(currentIndex>=0){audio.play().catch(()=>{});isPlaying=!0;document.getElementById('nowPlayBtn').innerHTML='<i class="fa-solid fa-pause"></i>';startProgress()}
+}
 function next(){if(tracks.length){currentIndex=(currentIndex+1)%tracks.length;playMusic(currentIndex)}}
 function prev(){if(tracks.length){currentIndex=(currentIndex-1+tracks.length)%tracks.length;playMusic(currentIndex)}}
 function startProgress(){clearInterval(progressInterval);let w=0;document.getElementById('nowProgressFill').style.width='0%';progressInterval=setInterval(()=>{w+=0.5;if(w>=100){w=0;next()}document.getElementById('nowProgressFill').style.width=w+'%'},1000)}
