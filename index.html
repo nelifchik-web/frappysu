@@ -40,11 +40,7 @@
             display: flex; align-items: center; justify-content: center;
             transition: all 0.25s;
         }
-        .server-icon.active {
-            border-radius: 14px; background: rgba(205,0,205,0.2);
-            border-color: #cd00cd; color: #fff;
-            box-shadow: 0 0 15px rgba(205,0,205,0.6);
-        }
+        .server-icon.active { background: rgba(205,0,205,0.2); border-color: #cd00cd; color: #fff; }
         
         .main-content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
         
@@ -144,7 +140,6 @@
             z-index: 50; display: none; flex-direction: column;
         }
         .video-overlay.active { display: flex; }
-        
         .video-frame-wrap {
             flex: 1; display: flex; align-items: center; justify-content: center;
             padding: 20px; position: relative;
@@ -158,23 +153,10 @@
             animation: neonPulse 2s ease-in-out infinite; pointer-events: none; z-index: 1;
         }
         @keyframes neonPulse { 0%,100%{opacity:0.5} 50%{opacity:1} }
-        
         .video-frame-wrap iframe {
             width: 100%; height: 100%; max-height: 70vh;
             border-radius: 20px; border: none; position: relative; z-index: 0;
         }
-        
-        .video-controls {
-            display: flex; align-items: center; gap: 12px;
-            padding: 12px 20px; background: rgba(0,0,0,0.8);
-        }
-        .vc-btn {
-            background: none; border: none; color: #fff;
-            font-size: 20px; cursor: pointer; padding: 8px;
-            border-radius: 50%; transition: 0.2s;
-        }
-        .vc-btn:hover { background: rgba(205,0,205,0.3); }
-        .vc-btn.play { width: 44px; height: 44px; background: #cd00cd; border-radius: 50%; font-size: 18px; }
         .close-video {
             position: absolute; top: 20px; right: 20px;
             width: 40px; height: 40px; border-radius: 50%;
@@ -252,13 +234,6 @@
         <div class="video-frame-wrap">
             <iframe id="videoFrame" allow="autoplay; fullscreen"></iframe>
         </div>
-        <div class="video-controls">
-            <button class="vc-btn" id="btnVideoPrev"><i class="fa-solid fa-backward-step"></i></button>
-            <button class="vc-btn play" id="btnVideoPlay"><i class="fa-solid fa-pause"></i></button>
-            <button class="vc-btn" id="btnVideoNext"><i class="fa-solid fa-forward-step"></i></button>
-            <span style="flex:1"></span>
-            <button class="vc-btn" id="btnVideoClose"><i class="fa-solid fa-xmark"></i></button>
-        </div>
     </div>
 
     <iframe id="audioFrame" style="display:none" allow="autoplay"></iframe>
@@ -269,43 +244,37 @@
         let tracks = [];
         let videos = [];
         let currentIndex = -1;
-        let currentVideoIndex = -1;
         let isPlaying = false;
         let favorites = JSON.parse(localStorage.getItem('frappy_favs') || '[]');
         let progressInterval;
         let currentMusicTab = 'search';
         
-        // ВСЕ ОБРАБОТЧИКИ КНОПОК
-        document.getElementById('btnMusic').addEventListener('click', function() { switchTab('music'); });
-        document.getElementById('btnVideo').addEventListener('click', function() { switchTab('video'); });
-        document.getElementById('btnChats').addEventListener('click', function() { switchTab('chats'); });
-        
-        document.getElementById('tabSearch').addEventListener('click', function() { switchMusicTab('search'); });
-        document.getElementById('tabFav').addEventListener('click', function() { switchMusicTab('favorites'); });
-        document.getElementById('tabWave').addEventListener('click', function() { switchMusicTab('wave'); });
-        
-        document.getElementById('btnMusicSearch').addEventListener('click', searchMusic);
-        document.getElementById('btnVideoSearch').addEventListener('click', searchVideo);
-        document.getElementById('btnStartWave').addEventListener('click', startWave);
-        
-        document.getElementById('nowPlayBtn').addEventListener('click', togglePlay);
-        document.getElementById('nowPrev').addEventListener('click', prev);
-        document.getElementById('nowNext').addEventListener('click', next);
-        document.getElementById('nowFavBtn').addEventListener('click', toggleFavCurrent);
-        
-        document.getElementById('btnCloseVideo').addEventListener('click', closeVideo);
-        document.getElementById('btnVideoClose').addEventListener('click', closeVideo);
-        document.getElementById('btnVideoPrev').addEventListener('click', videoPrev);
-        document.getElementById('btnVideoNext').addEventListener('click', videoNext);
-        
-        function switchTab(tab) {
+        // КНОПКИ СЕРВЕРНОЙ ПАНЕЛИ
+        document.getElementById('btnMusic').onclick = function() {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('screen-' + tab).classList.add('active');
+            document.getElementById('screen-music').classList.add('active');
             document.querySelectorAll('.server-icon').forEach(s => s.classList.remove('active'));
-            if (tab === 'music') document.getElementById('btnMusic').classList.add('active');
-            if (tab === 'video') document.getElementById('btnVideo').classList.add('active');
-            if (tab === 'chats') document.getElementById('btnChats').classList.add('active');
-        }
+            this.classList.add('active');
+        };
+        
+        document.getElementById('btnVideo').onclick = function() {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('screen-video').classList.add('active');
+            document.querySelectorAll('.server-icon').forEach(s => s.classList.remove('active'));
+            this.classList.add('active');
+        };
+        
+        document.getElementById('btnChats').onclick = function() {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('screen-chats').classList.add('active');
+            document.querySelectorAll('.server-icon').forEach(s => s.classList.remove('active'));
+            this.classList.add('active');
+        };
+        
+        // ВКЛАДКИ МУЗЫКИ
+        document.getElementById('tabSearch').onclick = function() { switchMusicTab('search'); };
+        document.getElementById('tabFav').onclick = function() { switchMusicTab('favorites'); };
+        document.getElementById('tabWave').onclick = function() { switchMusicTab('wave'); };
         
         function switchMusicTab(tab) {
             currentMusicTab = tab;
@@ -320,10 +289,13 @@
             if (tab === 'favorites') renderFavorites();
         }
         
+        // ПОИСК МУЗЫКИ
+        document.getElementById('btnMusicSearch').onclick = searchMusic;
+        
         async function searchMusic() {
             const q = document.getElementById('musicInput').value.trim();
             if (!q) return;
-            document.getElementById('musicList').innerHTML = '<div style="text-align:center;color:#8b6ba0;padding:40px">Ищу...</div>';
+            document.getElementById('musicList').innerHTML = '<div style="text-align:center;padding:40px;color:#8b6ba0">Ищу...</div>';
             try {
                 const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q+' music')}&type=video&maxResults=15&key=${API_KEY}`);
                 const data = await res.json();
@@ -348,8 +320,13 @@
             updateNowFavBtn();
         }
         
-        function toggleFavCurrent() { if (currentIndex >= 0) { const t = tracks[currentIndex]; toggleFav(t.id, t.title, t.artist, t.thumb); } }
-        function updateNowFavBtn() { if (currentIndex >= 0) document.getElementById('nowFavBtn').classList.toggle('liked', isFav(tracks[currentIndex].id)); }
+        document.getElementById('nowFavBtn').onclick = function() {
+            if (currentIndex >= 0) { const t = tracks[currentIndex]; toggleFav(t.id, t.title, t.artist, t.thumb); }
+        };
+        
+        function updateNowFavBtn() {
+            if (currentIndex >= 0) document.getElementById('nowFavBtn').classList.toggle('liked', isFav(tracks[currentIndex].id));
+        }
         
         function renderFavorites() {
             if (favorites.length === 0) { document.getElementById('favList').innerHTML = '<div style="text-align:center;color:#8b6ba0;padding:40px">Нет избранных треков</div>'; return; }
@@ -360,6 +337,8 @@
                     <div class="card-info"><div class="card-title">${t.title}</div><div class="card-sub">🎵 ${t.artist}</div></div>
                 </div>`).join('');
         }
+        
+        document.getElementById('btnStartWave').onclick = startWave;
         
         async function startWave() {
             document.getElementById('waveTrack').textContent = 'Подбираю...';
@@ -389,4 +368,54 @@
             updateNowFavBtn();
             document.getElementById('audioFrame').src = `https://www.youtube.com/embed/${t.id}?autoplay=1&controls=0`;
             isPlaying = true;
-            document.getElementById('nowPlayBtn').innerHT
+            document.getElementById('nowPlayBtn').innerHTML = '<i class="fa-solid fa-pause"></i>';
+            startProgress();
+        }
+        
+        document.getElementById('nowPlayBtn').onclick = function() {
+            if (isPlaying) { document.getElementById('audioFrame').src = ''; isPlaying = false; this.innerHTML = '<i class="fa-solid fa-play"></i>'; clearInterval(progressInterval); }
+            else if (currentIndex >= 0) playMusic(currentIndex);
+        };
+        
+        document.getElementById('nowPrev').onclick = function() { if (tracks.length) { currentIndex = (currentIndex-1+tracks.length) % tracks.length; playMusic(currentIndex); } };
+        document.getElementById('nowNext').onclick = function() { if (tracks.length) { currentIndex = (currentIndex+1) % tracks.length; playMusic(currentIndex); } };
+        
+        function startProgress() {
+            clearInterval(progressInterval); let w = 0;
+            document.getElementById('nowProgressFill').style.width = '0%';
+            progressInterval = setInterval(() => { w += 0.5; if (w >= 100) { w = 0; document.getElementById('nowNext').onclick(); } document.getElementById('nowProgressFill').style.width = w + '%'; }, 1000);
+        }
+        
+        // ПОИСК ВИДЕО
+        document.getElementById('btnVideoSearch').onclick = searchVideo;
+        
+        async function searchVideo() {
+            const q = document.getElementById('videoInput').value.trim();
+            if (!q) return;
+            document.getElementById('videoList').innerHTML = '<div style="text-align:center;padding:40px;color:#8b6ba0">Ищу...</div>';
+            try {
+                const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&type=video&maxResults=15&key=${API_KEY}`);
+                const data = await res.json();
+                if (data.items) {
+                    videos = data.items.map(item => ({ id: item.id.videoId, title: item.snippet.title, artist: item.snippet.channelTitle, thumb: item.snippet.thumbnails.default.url }));
+                    document.getElementById('videoList').innerHTML = videos.map((v, i) => `
+                        <div class="card" onclick="playVideo(${i})">
+                            <div class="card-thumb" style="background-image:url('${v.thumb}')"></div>
+                            <div class="card-info"><div class="card-title">${v.title}</div><div class="card-sub">${v.artist}</div></div>
+                        </div>`).join('');
+                }
+            } catch(e) {}
+        }
+        
+        function playVideo(index) {
+            document.getElementById('videoOverlay').classList.add('active');
+            document.getElementById('videoFrame').src = `https://www.youtube.com/embed/${videos[index].id}?autoplay=1`;
+        }
+        
+        document.getElementById('btnCloseVideo').onclick = function() {
+            document.getElementById('videoOverlay').classList.remove('active');
+            document.getElementById('videoFrame').src = '';
+        };
+    </script>
+</body>
+</html>
