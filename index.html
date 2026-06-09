@@ -37,6 +37,7 @@
         .now-controls{display:flex;gap:10px;align-items:center}
         .now-btn{background:none;border:none;color:#fff;font-size:18px;cursor:pointer;padding:6px}
         .now-btn.play{width:36px;height:36px;border-radius:50%;background:#fff;color:#06030a;font-size:14px}
+        @keyframes marq{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
     </style>
 </head>
 <body>
@@ -135,17 +136,32 @@ function playMusic(i){
     if(t.title.length>25){titleEl.innerHTML=`<div style="overflow:hidden;white-space:nowrap"><div style="display:inline-block;animation:marq 8s linear infinite">${t.title} &nbsp;&nbsp;&nbsp; ${t.title}</div></div>`}else{titleEl.textContent=t.title}
     document.getElementById('nowArtist').textContent=t.artist;
     document.getElementById('nowBar').classList.add('active');
-    document.getElementById('audioFrame').src=`https://www.youtube.com/embed/${t.id}?autoplay=1&controls=0`;
-    isPlaying=!0;document.getElementById('nowPlayBtn').innerHTML='<i class="fa-solid fa-pause"></i>';startProgress()
+    document.getElementById('audioFrame').src=`https://www.youtube.com/embed/${t.id}?autoplay=1&controls=0&origin=https://frappy-app.onrender.com`;
+    isPlaying=!0;document.getElementById('nowPlayBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
+    
+    // Кнопка включения звука
+    if(!document.getElementById('unmuteBtn')){
+        let btn=document.createElement('button');
+        btn.id='unmuteBtn';
+        btn.textContent='🔊 Нажми чтобы включить звук';
+        btn.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:60;padding:20px 30px;background:#cd00cd;color:#fff;border:none;border-radius:16px;font-size:18px;font-weight:700;cursor:pointer;box-shadow:0 0 30px rgba(205,0,205,0.6)';
+        btn.onclick=function(){
+            document.getElementById('audioFrame').src=document.getElementById('audioFrame').src;
+            btn.remove();
+        };
+        document.body.appendChild(btn);
+    }
+    startProgress();
 }
 
-function playVideo(id){document.getElementById('audioFrame').src=`https://www.youtube.com/embed/${id}?autoplay=1&controls=1`;document.getElementById('audioFrame').style.cssText='position:fixed;inset:0;width:100%;height:100%;z-index:50;display:block'}
+function playVideo(id){
+    window.open(`https://www.youtube.com/watch?v=${id}`, '_blank');
+}
 
 function togglePlay(){if(isPlaying){document.getElementById('audioFrame').src='';isPlaying=!1;document.getElementById('nowPlayBtn').innerHTML='<i class="fa-solid fa-play"></i>';clearInterval(progressInterval)}else if(currentIndex>=0)playMusic(currentIndex)}
 function next(){if(tracks.length){currentIndex=(currentIndex+1)%tracks.length;playMusic(currentIndex)}}
 function prev(){if(tracks.length){currentIndex=(currentIndex-1+tracks.length)%tracks.length;playMusic(currentIndex)}}
 function startProgress(){clearInterval(progressInterval);let w=0;document.getElementById('nowProgressFill').style.width='0%';progressInterval=setInterval(()=>{w+=0.5;if(w>=100){w=0;next()}document.getElementById('nowProgressFill').style.width=w+'%'},1000)}
 </script>
-<style>@keyframes marq{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}</style>
 </body>
 </html>
