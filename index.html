@@ -35,8 +35,7 @@
             backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(205,0,205,0.1);
             display: flex; justify-content: space-between; align-items: center;
-            z-index: 30;
-            flex-shrink: 0;
+            z-index: 30; flex-shrink: 0;
         }
         .logo {
             font-size: 24px; font-weight: 800;
@@ -50,7 +49,7 @@
             border-radius: 8px; display: flex; align-items: center; gap: 6px;
         }
         
-        .screen { flex: 1; overflow-y: auto; padding: 20px 20px 20px 20px; display: none; }
+        .screen { flex: 1; overflow-y: auto; padding: 20px; display: none; }
         .screen.active { display: block; }
         
         .auth-box {
@@ -202,7 +201,6 @@
         </div>
     </div>
 
-    <!-- ЭКРАНЫ -->
     <div class="screen active" id="screen-login">
         <div class="auth-box">
             <h2>Frappy</h2>
@@ -252,7 +250,6 @@
         </div>
     </div>
 
-    <!-- NOW BAR -->
     <div class="now-bar" id="nowBar">
         <div class="now-progress"><div class="now-progress-fill" id="nowProgressFill"></div></div>
         <div class="now-thumb" id="nowThumb">🎵</div>
@@ -281,6 +278,14 @@
         let favorites = JSON.parse(localStorage.getItem('frappy_favs') || '[]');
         let progressInterval;
         let currentTab = 'search';
+        
+        // Автовход
+        if (currentUser) {
+            document.getElementById('screen-login').classList.remove('active');
+            document.getElementById('tabLogin').style.display = 'none';
+            document.getElementById('tabProfile').style.display = 'block';
+            showScreen('music');
+        }
         
         function showScreen(screen) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -311,28 +316,44 @@
             const pass = document.getElementById('loginPass').value.trim();
             if (!name || !pass) { showError('Заполни все поля'); return; }
             if (users[name]) { showError('Пользователь уже существует'); return; }
+            
             users[name] = { name, pass };
             localStorage.setItem('frappy_users', JSON.stringify(users));
             currentUser = { name, pass };
             localStorage.setItem('frappy_user', JSON.stringify(currentUser));
+            
+            document.getElementById('loginName').value = '';
+            document.getElementById('loginPass').value = '';
+            document.getElementById('loginError').style.display = 'none';
             afterLogin();
         }
         
         function login() {
             const name = document.getElementById('loginName').value.trim();
             const pass = document.getElementById('loginPass').value.trim();
+            
             if (users[name] && users[name].pass === pass) {
                 currentUser = { name, pass };
                 localStorage.setItem('frappy_user', JSON.stringify(currentUser));
+                document.getElementById('loginName').value = '';
+                document.getElementById('loginPass').value = '';
+                document.getElementById('loginError').style.display = 'none';
                 afterLogin();
-            } else { showError('Неверное имя или пароль'); }
+            } else {
+                showError('Неверное имя или пароль');
+            }
         }
         
-        function showError(msg) { const el = document.getElementById('loginError'); el.style.display = 'block'; el.textContent = msg; }
+        function showError(msg) {
+            const el = document.getElementById('loginError');
+            el.style.display = 'block';
+            el.textContent = msg;
+        }
         
         function afterLogin() {
             document.getElementById('tabLogin').style.display = 'none';
             document.getElementById('tabProfile').style.display = 'block';
+            document.getElementById('screen-login').classList.remove('active');
             showScreen('music');
         }
         
@@ -341,9 +362,11 @@
             currentUser = null;
             document.getElementById('tabLogin').style.display = 'block';
             document.getElementById('tabProfile').style.display = 'none';
+            document.getElementById('nowBar').classList.remove('active');
+            document.getElementById('ytFrame').src = '';
+            isPlaying = false;
+            clearInterval(progressInterval);
             showScreen('login');
-            document.getElementById('loginName').value = '';
-            document.getElementById('loginPass').value = '';
         }
         
         async function search() {
@@ -414,22 +437,4 @@
         
         function renderFavorites() {
             if (favorites.length === 0) {
-                document.getElementById('favList').innerHTML = '<div style="text-align:center;color:var(--text2);padding:40px">Нет избранных треков</div>';
-                return;
-            }
-            tracks = [...favorites];
-            renderTrackList(favorites, 'favList');
-        }
-        
-        async function startWave() {
-            document.getElementById('waveTrack').textContent = 'Подбираю трек...';
-            let query = 'popular music';
-            if (favorites.length > 0) {
-                const fav = favorites[Math.floor(Math.random() * favorites.length)];
-                query = fav.artist + ' ' + fav.title.split(' ').slice(0, 2).join(' ');
-            }
-            try {
-                const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=5&key=${API_KEY}`);
-                const data = await res.json();
-                if (data.items && data.items.length > 0) {
-                    const pick = data.items[Math.floor(Math.random() * data.items.length)
+                document.getElementById('favList').innerHTML = '<div style="text-align:center;color:var(--text2);padding:40px">Нет избр
