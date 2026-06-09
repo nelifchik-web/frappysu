@@ -37,6 +37,13 @@
         .now-controls{display:flex;gap:10px;align-items:center}
         .now-btn{background:none;border:none;color:#fff;font-size:18px;cursor:pointer;padding:6px}
         .now-btn.play{width:36px;height:36px;border-radius:50%;background:#fff;color:#06030a;font-size:14px}
+        
+        /* ВИДЕО ПЛЕЕР */
+        .video-overlay{position:fixed;inset:0;background:#000;z-index:50;display:none;flex-direction:column}
+        .video-overlay.active{display:flex}
+        .video-overlay iframe{flex:1;width:100%;border:none}
+        .video-close{position:absolute;top:16px;right:16px;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,0.6);color:#fff;border:none;font-size:20px;cursor:pointer;z-index:51;display:flex;align-items:center;justify-content:center}
+        
         @keyframes marq{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
     </style>
 </head>
@@ -84,6 +91,12 @@
         <button class="now-btn play" id="nowPlayBtn"><i class="fa-solid fa-play"></i></button>
         <button class="now-btn" id="nowNext"><i class="fa-solid fa-forward-step"></i></button>
     </div>
+</div>
+
+<!-- ВИДЕО ПЛЕЕР -->
+<div class="video-overlay" id="videoOverlay">
+    <button class="video-close" onclick="closeVideo()">✕</button>
+    <iframe id="videoFrame" allow="autoplay; fullscreen"></iframe>
 </div>
 
 <iframe id="audioFrame" style="display:none" allow="autoplay"></iframe>
@@ -138,24 +151,17 @@ function playMusic(i){
     document.getElementById('nowBar').classList.add('active');
     document.getElementById('audioFrame').src=`https://www.youtube.com/embed/${t.id}?autoplay=1&controls=0&origin=https://frappy-app.onrender.com`;
     isPlaying=!0;document.getElementById('nowPlayBtn').innerHTML='<i class="fa-solid fa-pause"></i>';
-    
-    // Кнопка включения звука
-    if(!document.getElementById('unmuteBtn')){
-        let btn=document.createElement('button');
-        btn.id='unmuteBtn';
-        btn.textContent='🔊 Нажми чтобы включить звук';
-        btn.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:60;padding:20px 30px;background:#cd00cd;color:#fff;border:none;border-radius:16px;font-size:18px;font-weight:700;cursor:pointer;box-shadow:0 0 30px rgba(205,0,205,0.6)';
-        btn.onclick=function(){
-            document.getElementById('audioFrame').src=document.getElementById('audioFrame').src;
-            btn.remove();
-        };
-        document.body.appendChild(btn);
-    }
     startProgress();
 }
 
 function playVideo(id){
-    window.open(`https://www.youtube.com/watch?v=${id}`, '_blank');
+    document.getElementById('videoOverlay').classList.add('active');
+    document.getElementById('videoFrame').src=`https://www.youtube.com/embed/${id}?autoplay=1`;
+}
+
+function closeVideo(){
+    document.getElementById('videoOverlay').classList.remove('active');
+    document.getElementById('videoFrame').src='';
 }
 
 function togglePlay(){if(isPlaying){document.getElementById('audioFrame').src='';isPlaying=!1;document.getElementById('nowPlayBtn').innerHTML='<i class="fa-solid fa-play"></i>';clearInterval(progressInterval)}else if(currentIndex>=0)playMusic(currentIndex)}
