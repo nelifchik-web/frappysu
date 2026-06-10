@@ -1,15 +1,66 @@
-console.log("FRAPPY STARTED");
+const SERVER = "https://frappy-server.onrender.com";
 
-const tabs = document.querySelectorAll(".server-icon");
+const createBtn = document.getElementById("createBtn");
 
-tabs.forEach(tab => {
-    tab.addEventListener("click", () => {
+createBtn.addEventListener("click", createProfile);
 
-        tabs.forEach(btn => {
-            btn.classList.remove("active");
-        });
+async function createProfile() {
 
-        tab.classList.add("active");
+    const username = document
+        .getElementById("username")
+        .value
+        .trim();
 
-    });
-});
+    const status = document
+        .getElementById("status")
+        .value
+        .trim();
+
+    const message = document.getElementById("message");
+
+    if (!username) {
+        message.textContent = "Введи ник";
+        return;
+    }
+
+    message.textContent = "Создаю профиль...";
+
+    try {
+
+        const response = await fetch(
+            `${SERVER}/create-profile`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    username,
+                    status
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (!data.success) {
+            message.textContent = data.message;
+            return;
+        }
+
+        localStorage.setItem(
+            "frappy_user",
+            JSON.stringify(data.user)
+        );
+
+        message.textContent =
+            "Профиль создан 🔥";
+
+    } catch (err) {
+
+        message.textContent =
+            "Ошибка подключения к серверу";
+
+    }
+
+}
