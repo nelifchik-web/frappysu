@@ -6,35 +6,43 @@
     <title>Frappy</title>
 
     <link rel="stylesheet" href="style.css">
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
 </head>
 <body>
 
-<div class="server-bar">
-    <button class="server-icon active">🎵</button>
-    <button class="server-icon">💬</button>
-    <button class="server-icon">👤</button>
-</div>
+<div class="profile-setup">
 
-<div class="main-content">
+    <div class="logo">FRAPPY</div>
 
-    <div class="header">
-        <div class="logo">FRAPPY</div>
-    </div>
+    <div class="setup-card">
 
-    <div class="screen">
+        <h2>Создай профиль</h2>
 
-        <h2>Музыка</h2>
+        <input
+            type="text"
+            id="username"
+            placeholder="Уникальный ник"
+            class="input"
+        >
 
-        <div class="search-row">
-            <input type="text" placeholder="Поиск трека..." class="search-box">
-            <button class="search-btn">Найти</button>
-        </div>
+        <input
+            type="text"
+            id="avatar"
+            placeholder="Ссылка на аватар"
+            class="input"
+        >
 
-        <div id="musicList">
-            Скоро здесь будет музыка 🎵
-        </div>
+        <input
+            type="text"
+            id="status"
+            placeholder="Статус"
+            class="input"
+        >
+
+        <button id="createBtn" class="create-btn">
+            Создать профиль
+        </button>
+
+        <div id="message"></div>
 
     </div>
 
