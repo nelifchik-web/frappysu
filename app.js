@@ -4,7 +4,9 @@ const createBtn = document.getElementById("createBtn");
 
 checkLogin();
 
-createBtn.addEventListener("click", createProfile);
+if (createBtn) {
+    createBtn.addEventListener("click", createProfile);
+}
 
 function checkLogin() {
 
@@ -12,7 +14,7 @@ function checkLogin() {
 
     if (!user) return;
 
-    showProfile(JSON.parse(user));
+    showHome(JSON.parse(user));
 }
 
 async function createProfile() {
@@ -64,7 +66,7 @@ async function createProfile() {
             JSON.stringify(data.user)
         );
 
-        showProfile(data.user);
+        showHome(data.user);
 
     } catch {
 
@@ -74,26 +76,61 @@ async function createProfile() {
     }
 }
 
-function showProfile(user) {
+function showHome(user) {
 
     document.body.innerHTML = `
-    
+
     <div class="profile-setup">
 
-        <div class="logo">FRAPPY</div>
+        <div class="logo">
+            FRAPPY
+        </div>
 
         <div class="setup-card">
 
-            <h2>${user.username}</h2>
+            <h2 style="text-align:center;">
+                Привет, ${user.username} 👋
+            </h2>
 
-            <p style="text-align:center;color:#8b6ba0;margin-top:10px;">
+            <p style="
+                text-align:center;
+                color:#8b6ba0;
+                margin-top:10px;
+                margin-bottom:25px;
+            ">
                 ${user.status || "Без статуса"}
             </p>
 
             <button
                 class="create-btn"
+                onclick="alert('Музыка скоро будет 🔥')"
+            >
+                🎵 Музыка
+            </button>
+
+            <button
+                class="create-btn"
+                style="margin-top:10px;"
+                onclick="alert('Видео скоро будет 🔥')"
+            >
+                🎬 Видео
+            </button>
+
+            <button
+                class="create-btn"
+                style="margin-top:10px;"
+                onclick="alert('Чаты скоро будут 🔥')"
+            >
+                💬 Чаты
+            </button>
+
+            <button
+                class="create-btn"
+                style="
+                    margin-top:20px;
+                    background:#2b1838;
+                "
                 onclick="logout()"
-                style="margin-top:20px;"
             >
                 Выйти
             </button>
