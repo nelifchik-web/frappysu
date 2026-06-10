@@ -9,62 +9,81 @@ app.use(express.json());
 
 const USERS_FILE = "./users.json";
 
-// Получить всех пользователей
-app.get("/users", (req, res) => {
+function getUsers() {
     try {
-        const users = JSON.parse(fs.readFileSync(USERS_FILE));
-        res.json(users);
+        return JSON.parse(fs.readFileSync(USERS_FILE));
     } catch {
-        res.json([]);
+        return [];
     }
+}
+
+function saveUsers(users) {
+    fs.writeFileSync(
+        USERS_FILE,
+        JSON.stringify(users, null, 2)
+    );
+}
+
+app.get("/users", (req, res) => {
+    res.json(getUsers());
 });
 
-// Создать профиль
-app.post("/create-profile", (req, res) => {
-    const { username, avatar, status } = req.body;
+app.get("/user/:id", (req, res) => {
+    const users = getUsers();
 
-    if (!username) {
-        return res.status(400).json({
-            success: false,
-            message: "Укажи ник"
+    const user = users.find(
+        u => u.id === req.params.id
+    );
+
+    if (!user) {
+        return res.status(404).json({
+            success: false
         });
     }
 
-    let users = [];
+    res.json(user);
+});
 
-    try {
-        users = JSON.parse(fs.readFileSync(USERS_FILE));
-    } catch {}
+app.post("/create-profile", (req, res) => {
+
+    const { username, status } = req.body;
+
+    if (!username) {
+        return res.json({
+            success: false,
+            message: "Введи ник"
+        });
+    }
+
+    const users = getUsers();
 
     const exists = users.find(
-        user => user.username.toLowerCase() === username.toLowerCase()
+        u =>
+            u.username.toLowerCase() ===
+            username.toLowerCase()
     );
 
     if (exists) {
         return res.json({
             success: false,
-            message: "Ник уже занят"
+            message: "Ник занят"
         });
     }
 
-    const newUser = {
+    const user = {
         id: "frp_" + Date.now(),
         username,
-        avatar,
         status: status || "",
         createdAt: new Date().toISOString()
     };
 
-    users.push(newUser);
+    users.push(user);
 
-    fs.writeFileSync(
-        USERS_FILE,
-        JSON.stringify(users, null, 2)
-    );
+    saveUsers(users);
 
     res.json({
         success: true,
-        user: newUser
+        user
     });
 });
 
