@@ -19,64 +19,26 @@ body{
     font-family:'Inter',sans-serif;
     background:var(--bg);
     color:var(--text);
-    height:100vh;
-    display:flex;
-    overflow:hidden;
-}
-
-.server-bar{
-    width:70px;
-    background:rgba(5,2,10,.95);
-    border-right:1px solid rgba(205,0,205,.15);
+    min-height:100vh;
 
     display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:12px;
-
-    padding:15px 8px;
-}
-
-.server-icon{
-    width:50px;
-    height:50px;
-
-    border:none;
-    border-radius:16px;
-
-    background:rgba(255,255,255,.04);
-
-    color:white;
-    font-size:20px;
-
-    cursor:pointer;
-}
-
-.server-icon.active{
-    background:rgba(205,0,205,.25);
-    box-shadow:0 0 15px rgba(205,0,205,.45);
-}
-
-.main-content{
-    flex:1;
-    display:flex;
-    flex-direction:column;
-}
-
-.header{
-    height:70px;
-
-    display:flex;
+    justify-content:center;
     align-items:center;
 
-    padding:0 20px;
+    padding:20px;
+}
 
-    border-bottom:1px solid rgba(205,0,205,.15);
+.profile-setup{
+    width:100%;
+    max-width:420px;
 }
 
 .logo{
-    font-size:28px;
+    text-align:center;
+    font-size:42px;
     font-weight:800;
+
+    margin-bottom:25px;
 
     background:linear-gradient(
         135deg,
@@ -88,20 +50,29 @@ body{
     -webkit-text-fill-color:transparent;
 }
 
-.screen{
-    padding:20px;
+.setup-card{
+    background:rgba(20,10,30,.75);
+
+    border:1px solid rgba(205,0,205,.2);
+
+    border-radius:24px;
+
+    padding:25px;
+
+    backdrop-filter:blur(20px);
 }
 
-.search-row{
-    display:flex;
-    gap:10px;
-    margin-top:20px;
+.setup-card h2{
+    text-align:center;
+    margin-bottom:20px;
 }
 
-.search-box{
-    flex:1;
+.input{
+    width:100%;
 
     padding:14px;
+
+    margin-bottom:12px;
 
     border:none;
     border-radius:12px;
@@ -109,23 +80,42 @@ body{
     background:rgba(255,255,255,.05);
 
     color:white;
+
+    outline:none;
 }
 
-.search-btn{
-    padding:14px 20px;
+.input::placeholder{
+    color:var(--text2);
+}
+
+.create-btn{
+    width:100%;
+
+    padding:14px;
 
     border:none;
     border-radius:12px;
 
-    background:var(--pink);
+    background:linear-gradient(
+        135deg,
+        var(--pink),
+        var(--purple)
+    );
 
     color:white;
+    font-weight:700;
 
     cursor:pointer;
-    font-weight:600;
+
+    margin-top:8px;
 }
 
-#musicList{
-    margin-top:20px;
+#createBtn:active{
+    transform:scale(.98);
+}
+
+#message{
+    margin-top:15px;
+    text-align:center;
     color:var(--text2);
 }
