@@ -2,7 +2,18 @@ const SERVER = "https://frappy-server.onrender.com";
 
 const createBtn = document.getElementById("createBtn");
 
+checkLogin();
+
 createBtn.addEventListener("click", createProfile);
+
+function checkLogin() {
+
+    const user = localStorage.getItem("frappy_user");
+
+    if (!user) return;
+
+    showProfile(JSON.parse(user));
+}
 
 async function createProfile() {
 
@@ -53,14 +64,52 @@ async function createProfile() {
             JSON.stringify(data.user)
         );
 
-        message.textContent =
-            "Профиль создан 🔥";
+        showProfile(data.user);
 
-    } catch (err) {
+    } catch {
 
         message.textContent =
-            "Ошибка подключения к серверу";
+            "Ошибка подключения";
 
     }
+}
 
+function showProfile(user) {
+
+    document.body.innerHTML = `
+    
+    <div class="profile-setup">
+
+        <div class="logo">FRAPPY</div>
+
+        <div class="setup-card">
+
+            <h2>${user.username}</h2>
+
+            <p style="text-align:center;color:#8b6ba0;margin-top:10px;">
+                ${user.status || "Без статуса"}
+            </p>
+
+            <button
+                class="create-btn"
+                onclick="logout()"
+                style="margin-top:20px;"
+            >
+                Выйти
+            </button>
+
+        </div>
+
+    </div>
+
+    `;
+}
+
+function logout() {
+
+    localStorage.removeItem(
+        "frappy_user"
+    );
+
+    location.reload();
 }
