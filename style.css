@@ -11,66 +11,19 @@ body{
     background:#313338;
     color:#fff;
     min-height:100vh;
-    overflow:hidden;
 }
 
 .app{
     display:flex;
     width:100%;
-    height:100vh;
+    min-height:100vh;
 }
 
-/* ЛЕВАЯ ПАНЕЛЬ */
-
-.sidebar{
-    width:72px;
-    background:#1e1f22;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    padding:12px 0;
-    gap:12px;
-}
-
-.server-logo{
-    width:50px;
-    height:50px;
-    border-radius:16px;
-    background:linear-gradient(
-        135deg,
-        #ff00ff,
-        #7b2cff
-    );
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:24px;
-    font-weight:800;
-    cursor:pointer;
-}
-
-.nav-btn{
-    width:50px;
-    height:50px;
-    border-radius:50%;
-    background:#2b2d31;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:22px;
-    cursor:pointer;
-    transition:.2s;
-}
-
-.nav-btn:hover{
-    background:#5865f2;
-    border-radius:16px;
-}
-
-/* ВТОРАЯ ПАНЕЛЬ */
+/* ОСНОВНАЯ ПАНЕЛЬ */
 
 .channels{
-    width:240px;
+    width:180px;
+    min-width:180px;
     background:#2b2d31;
     display:flex;
     flex-direction:column;
@@ -79,16 +32,17 @@ body{
 
 .channels-header{
     padding:20px;
-    font-size:20px;
+    font-size:22px;
     font-weight:800;
     border-bottom:1px solid #232428;
 }
 
 .channel{
-    padding:14px 20px;
+    padding:16px 20px;
     cursor:pointer;
     color:#b5bac1;
     transition:.2s;
+    font-size:16px;
 }
 
 .channel:hover{
@@ -131,7 +85,7 @@ body{
 
 .content{
     flex:1;
-    padding:25px;
+    padding:20px;
     overflow:auto;
 }
 
@@ -153,10 +107,6 @@ body{
     font-size:15px;
 }
 
-.input::placeholder{
-    color:#8e9297;
-}
-
 .create-btn{
     width:100%;
     padding:14px;
@@ -166,11 +116,6 @@ body{
     color:white;
     font-weight:700;
     cursor:pointer;
-    transition:.2s;
-}
-
-.create-btn:hover{
-    background:#6d78f5;
 }
 
 .track{
@@ -192,6 +137,20 @@ body{
     margin-bottom:12px;
 }
 
+/* УБИРАЕМ СТАРУЮ КОЛОНКУ */
+
+.sidebar{
+    display:none;
+}
+
+.server-logo{
+    display:none;
+}
+
+.nav-btn{
+    display:none;
+}
+
 /* РЕГИСТРАЦИЯ */
 
 .profile-setup{
@@ -206,13 +165,7 @@ body{
     font-size:52px;
     font-weight:800;
     margin-bottom:25px;
-
-    background:linear-gradient(
-        135deg,
-        #ff00ff,
-        #7b2cff
-    );
-
+    background:linear-gradient(135deg,#ff00ff,#7b2cff);
     -webkit-background-clip:text;
     -webkit-text-fill-color:transparent;
 }
@@ -233,15 +186,4 @@ body{
     text-align:center;
     margin-top:15px;
     color:#b5bac1;
-}
-
-/* СКРОЛЛ */
-
-::-webkit-scrollbar{
-    width:8px;
-}
-
-::-webkit-scrollbar-thumb{
-    background:#444;
-    border-radius:20px;
 }
