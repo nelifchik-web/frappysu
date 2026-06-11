@@ -14,50 +14,61 @@ function checkLogin() {
 
     if (!user) return;
 
-    showHome(JSON.parse(user));
+    openApp(JSON.parse(user));
 }
 
 async function createProfile() {
 
-    const username = document
-        .getElementById("username")
+    const username =
+        document.getElementById("username")
         .value
         .trim();
 
-    const status = document
-        .getElementById("status")
+    const status =
+        document.getElementById("status")
         .value
         .trim();
 
-    const message = document.getElementById("message");
+    const message =
+        document.getElementById("message");
 
     if (!username) {
-        message.textContent = "Введи ник";
+
+        message.textContent =
+            "Введи ник";
+
         return;
     }
 
-    message.textContent = "Создаю профиль...";
-
     try {
 
-        const response = await fetch(
-            `${SERVER}/create-profile`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    username,
-                    status
-                })
-            }
-        );
+        message.textContent =
+            "Создаю профиль...";
 
-        const data = await response.json();
+        const response =
+            await fetch(
+                `${SERVER}/create-profile`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+                    body: JSON.stringify({
+                        username,
+                        status
+                    })
+                }
+            );
+
+        const data =
+            await response.json();
 
         if (!data.success) {
-            message.textContent = data.message;
+
+            message.textContent =
+                data.message;
+
             return;
         }
 
@@ -66,7 +77,7 @@ async function createProfile() {
             JSON.stringify(data.user)
         );
 
-        showHome(data.user);
+        openApp(data.user);
 
     } catch {
 
@@ -76,123 +87,124 @@ async function createProfile() {
     }
 }
 
-function showHome(user) {
+function openApp(user) {
 
     document.body.innerHTML = `
 
-    <div class="profile-setup">
+    <div class="app">
 
-        <div class="logo">
-            FRAPPY
-        </div>
+        <div class="sidebar">
 
-        <div class="setup-card">
-
-            <h2 style="text-align:center;">
-                ${user.username}
-            </h2>
-
-            <p style="
-                text-align:center;
-                color:#8b6ba0;
-                margin-top:10px;
-                margin-bottom:20px;
-            ">
-                ${user.status || "Без статуса"}
-            </p>
-
-            <input
-                id="musicSearch"
-                class="input"
-                placeholder="Поиск музыки..."
-            >
-
-            <button
-                class="create-btn"
-                onclick="searchMusic()"
-            >
-                🎵 Найти
-            </button>
+            <div class="server-logo">
+                F
+            </div>
 
             <div
-                id="musicResults"
-                style="margin-top:15px;"
-            ></div>
-
-            <button
-                class="create-btn"
-                style="
-                    margin-top:20px;
-                    background:#2b1838;
-                "
-                onclick="logout()"
+                class="nav-btn active"
+                onclick="showMusic()"
             >
-                Выйти
-            </button>
+                🎵
+            </div>
+
+            <div
+                class="nav-btn"
+                onclick="showVideo()"
+            >
+                🎬
+            </div>
+
+            <div
+                class="nav-btn"
+                onclick="showChats()"
+            >
+                💬
+            </div>
+
+            <div
+                class="nav-btn"
+                onclick="showProfile()"
+            >
+                👤
+            </div>
 
         </div>
 
+        <div
+            class="content"
+            id="content"
+        ></div>
+
     </div>
+
+    `;
+
+    showMusic();
+}
+
+function showMusic() {
+
+    document.getElementById(
+        "content"
+    ).innerHTML = `
+
+        <h2>🎵 Музыка</h2>
+
+        <input
+            id="musicSearch"
+            class="input"
+            placeholder="Найти трек..."
+        >
+
+        <button
+            class="create-btn"
+            onclick="searchMusic()"
+        >
+            Искать
+        </button>
+
+        <div id="musicResults"></div>
 
     `;
 }
 
 async function searchMusic() {
 
-    const q = document
-        .getElementById("musicSearch")
-        .value
-        .trim();
+    const q =
+        document.getElementById(
+            "musicSearch"
+        ).value.trim();
 
     if (!q) return;
 
     const results =
-        document.getElementById("musicResults");
+        document.getElementById(
+            "musicResults"
+        );
 
-    results.innerHTML = "Ищу...";
+    results.innerHTML =
+        "Поиск...";
 
     try {
 
-        const response = await fetch(
-            `${SERVER}/search?q=` +
-            encodeURIComponent(q)
-        );
+        const response =
+            await fetch(
+                `${SERVER}/search?q=` +
+                encodeURIComponent(q)
+            );
 
         const tracks =
             await response.json();
 
-        if (!tracks.length) {
-
-            results.innerHTML =
-                "Ничего не найдено";
-
-            return;
-        }
-
         results.innerHTML =
             tracks.map(track => `
 
-            <div
-                style="
-                    background:rgba(255,255,255,.05);
-                    border-radius:12px;
-                    padding:12px;
-                    margin-top:10px;
-                "
-            >
+            <div class="track">
 
-                <div style="
-                    font-weight:700;
-                    margin-bottom:5px;
-                ">
+                <div class="track-title">
                     ${track.title}
                 </div>
 
-                <div style="
-                    color:#8b6ba0;
-                    font-size:14px;
-                    margin-bottom:10px;
-                ">
+                <div class="track-artist">
                     ${track.artist}
                 </div>
 
@@ -205,7 +217,7 @@ async function searchMusic() {
 
             </div>
 
-        `).join("");
+            `).join("");
 
     } catch {
 
@@ -217,34 +229,89 @@ async function searchMusic() {
 
 function openTrack(id) {
 
-    const results =
-        document.getElementById("musicResults");
+    document.getElementById(
+        "content"
+    ).innerHTML = `
 
-    results.innerHTML = `
+        <h2>🎵 Плеер</h2>
 
         <iframe
             width="100%"
-            height="250"
+            height="260"
             src="https://www.youtube.com/embed/${id}?autoplay=1"
-            frameborder="0"
-            allow="autoplay; encrypted-media"
             allowfullscreen
-            style="
-                border:none;
-                border-radius:16px;
-            "
         ></iframe>
 
         <button
             class="create-btn"
             style="margin-top:15px;"
-            onclick="showHome(JSON.parse(localStorage.getItem('frappy_user')))"
+            onclick="showMusic()"
         >
-            ← Назад
+            Назад
         </button>
 
     `;
+}
 
+function showVideo() {
+
+    document.getElementById(
+        "content"
+    ).innerHTML = `
+
+        <h2>🎬 Видео</h2>
+
+        <p>
+            Раздел в разработке
+        </p>
+
+    `;
+}
+
+function showChats() {
+
+    document.getElementById(
+        "content"
+    ).innerHTML = `
+
+        <h2>💬 Чаты</h2>
+
+        <p>
+            Скоро будут
+        </p>
+
+    `;
+}
+
+function showProfile() {
+
+    const user = JSON.parse(
+        localStorage.getItem(
+            "frappy_user"
+        )
+    );
+
+    document.getElementById(
+        "content"
+    ).innerHTML = `
+
+        <h2>
+            ${user.username}
+        </h2>
+
+        <p>
+            ${user.status || "Без статуса"}
+        </p>
+
+        <button
+            class="create-btn"
+            style="margin-top:20px;"
+            onclick="logout()"
+        >
+            Выйти
+        </button>
+
+    `;
 }
 
 function logout() {
