@@ -99,32 +99,78 @@ function openApp(user) {
                 F
             </div>
 
-            <div
-                class="nav-btn active"
-                onclick="showMusic()"
-            >
+            <div class="nav-btn" onclick="showMusic()">
                 🎵
             </div>
 
-            <div
-                class="nav-btn"
-                onclick="showVideo()"
-            >
+            <div class="nav-btn" onclick="showVideo()">
                 🎬
             </div>
 
-            <div
-                class="nav-btn"
-                onclick="showChats()"
-            >
+            <div class="nav-btn" onclick="showChats()">
                 💬
             </div>
 
+            <div class="nav-btn" onclick="showProfile()">
+                👤
+            </div>
+
+        </div>
+
+        <div class="channels">
+
+            <div class="channels-header">
+                FRAPPY
+            </div>
+
             <div
-                class="nav-btn"
+                class="channel"
+                onclick="showMusic()"
+            >
+                🎵 Музыка
+            </div>
+
+            <div
+                class="channel"
+                onclick="showVideo()"
+            >
+                🎬 Видео
+            </div>
+
+            <div
+                class="channel"
+                onclick="showChats()"
+            >
+                💬 Чаты
+            </div>
+
+            <div
+                class="channel"
                 onclick="showProfile()"
             >
-                👤
+                👤 Профиль
+            </div>
+
+            <div class="profile-panel">
+
+                <div class="avatar">
+                    ${user.username
+                        .charAt(0)
+                        .toUpperCase()}
+                </div>
+
+                <div>
+
+                    <div class="user-name">
+                        ${user.username}
+                    </div>
+
+                    <div class="user-status">
+                        ${user.status || "Online"}
+                    </div>
+
+                </div>
+
             </div>
 
         </div>
@@ -147,7 +193,9 @@ function showMusic() {
         "content"
     ).innerHTML = `
 
-        <h2>🎵 Музыка</h2>
+        <div class="page-title">
+            🎵 Музыка
+        </div>
 
         <input
             id="musicSearch"
@@ -198,24 +246,24 @@ async function searchMusic() {
         results.innerHTML =
             tracks.map(track => `
 
-            <div class="track">
+                <div class="track">
 
-                <div class="track-title">
-                    ${track.title}
+                    <div class="track-title">
+                        ${track.title}
+                    </div>
+
+                    <div class="track-artist">
+                        ${track.artist}
+                    </div>
+
+                    <button
+                        class="create-btn"
+                        onclick="openTrack('${track.id}')"
+                    >
+                        ▶ Открыть
+                    </button>
+
                 </div>
-
-                <div class="track-artist">
-                    ${track.artist}
-                </div>
-
-                <button
-                    class="create-btn"
-                    onclick="openTrack('${track.id}')"
-                >
-                    ▶ Открыть
-                </button>
-
-            </div>
 
             `).join("");
 
@@ -242,11 +290,13 @@ function showVideo() {
         "content"
     ).innerHTML = `
 
-        <h2>🎬 Видео</h2>
+        <div class="page-title">
+            🎬 Видео
+        </div>
 
-        <p>
-            Раздел в разработке
-        </p>
+        <div class="track">
+            Раздел находится в разработке
+        </div>
 
     `;
 }
@@ -257,42 +307,63 @@ function showChats() {
         "content"
     ).innerHTML = `
 
-        <h2>💬 Чаты</h2>
+        <div class="page-title">
+            💬 Чаты
+        </div>
 
-        <p>
-            Скоро будут
-        </p>
+        <div class="track">
+            Скоро появятся личные сообщения
+        </div>
 
     `;
 }
 
 function showProfile() {
 
-    const user = JSON.parse(
-        localStorage.getItem(
-            "frappy_user"
-        )
-    );
+    const user =
+        JSON.parse(
+            localStorage.getItem(
+                "frappy_user"
+            )
+        );
 
     document.getElementById(
         "content"
     ).innerHTML = `
 
-        <h2>
-            ${user.username}
-        </h2>
+        <div class="page-title">
+            👤 Профиль
+        </div>
 
-        <p>
-            ${user.status || "Без статуса"}
-        </p>
+        <div class="track">
 
-        <button
-            class="create-btn"
-            style="margin-top:20px;"
-            onclick="logout()"
-        >
-            Выйти
-        </button>
+            <div
+                style="
+                    font-size:24px;
+                    font-weight:700;
+                    margin-bottom:10px;
+                "
+            >
+                ${user.username}
+            </div>
+
+            <div
+                style="
+                    color:#b5bac1;
+                    margin-bottom:20px;
+                "
+            >
+                ${user.status || "Без статуса"}
+            </div>
+
+            <button
+                class="create-btn"
+                onclick="logout()"
+            >
+                Выйти
+            </button>
+
+        </div>
 
     `;
 }
