@@ -10,9 +10,11 @@
 :root{
     --pink:#cd00cd;
     --purple:#9400d3;
-    --bg:#06030a;
-    --text:#e8d5f5;
-    --text2:#8b6ba0;
+    --bg:#09070d;
+    --card:#13101b;
+    --card2:#1a1524;
+    --text:#ffffff;
+    --text2:#9d89b5;
 }
 
 body{
@@ -20,24 +22,19 @@ body{
     background:var(--bg);
     color:var(--text);
     min-height:100vh;
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-
     padding:20px;
 }
 
 .profile-setup{
     width:100%;
-    max-width:420px;
+    max-width:500px;
+    margin:auto;
 }
 
 .logo{
     text-align:center;
     font-size:42px;
     font-weight:800;
-
     margin-bottom:25px;
 
     background:linear-gradient(
@@ -51,37 +48,54 @@ body{
 }
 
 .setup-card{
-    background:rgba(20,10,30,.75);
 
-    border:1px solid rgba(205,0,205,.2);
+    background:var(--card);
+
+    border:1px solid rgba(
+        205,
+        0,
+        205,
+        .15
+    );
 
     border-radius:24px;
 
-    padding:25px;
+    padding:20px;
 
-    backdrop-filter:blur(20px);
+    box-shadow:
+    0 0 40px rgba(
+        148,
+        0,
+        211,
+        .15
+    );
+
 }
 
 .setup-card h2{
     text-align:center;
-    margin-bottom:20px;
 }
 
 .input{
+
     width:100%;
 
-    padding:14px;
-
-    margin-bottom:12px;
+    background:var(--card2);
 
     border:none;
-    border-radius:12px;
 
-    background:rgba(255,255,255,.05);
+    border-radius:14px;
+
+    padding:15px;
 
     color:white;
 
+    margin-bottom:12px;
+
     outline:none;
+
+    font-size:15px;
+
 }
 
 .input::placeholder{
@@ -89,12 +103,20 @@ body{
 }
 
 .create-btn{
+
     width:100%;
 
-    padding:14px;
-
     border:none;
-    border-radius:12px;
+
+    border-radius:14px;
+
+    padding:15px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    color:white;
 
     background:linear-gradient(
         135deg,
@@ -102,20 +124,60 @@ body{
         var(--purple)
     );
 
-    color:white;
-    font-weight:700;
-
-    cursor:pointer;
-
-    margin-top:8px;
 }
 
-#createBtn:active{
+.create-btn:active{
     transform:scale(.98);
 }
 
 #message{
-    margin-top:15px;
     text-align:center;
+    margin-top:15px;
     color:var(--text2);
+}
+
+#musicResults{
+    margin-top:15px;
+}
+
+.track{
+
+    background:var(--card2);
+
+    border-radius:16px;
+
+    padding:14px;
+
+    margin-bottom:10px;
+
+}
+
+.track-title{
+
+    font-size:15px;
+
+    font-weight:700;
+
+    margin-bottom:5px;
+
+}
+
+.track-artist{
+
+    color:var(--text2);
+
+    font-size:13px;
+
+    margin-bottom:10px;
+
+}
+
+iframe{
+
+    width:100%;
+
+    border:none;
+
+    border-radius:16px;
+
 }
