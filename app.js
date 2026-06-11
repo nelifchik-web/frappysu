@@ -89,40 +89,35 @@ function showHome(user) {
         <div class="setup-card">
 
             <h2 style="text-align:center;">
-                Привет, ${user.username} 👋
+                ${user.username}
             </h2>
 
             <p style="
                 text-align:center;
                 color:#8b6ba0;
                 margin-top:10px;
-                margin-bottom:25px;
+                margin-bottom:20px;
             ">
                 ${user.status || "Без статуса"}
             </p>
 
-            <button
-                class="create-btn"
-                onclick="alert('Музыка скоро будет 🔥')"
+            <input
+                id="musicSearch"
+                class="input"
+                placeholder="Поиск музыки..."
             >
-                🎵 Музыка
-            </button>
 
             <button
                 class="create-btn"
-                style="margin-top:10px;"
-                onclick="alert('Видео скоро будет 🔥')"
+                onclick="searchMusic()"
             >
-                🎬 Видео
+                🎵 Найти
             </button>
 
-            <button
-                class="create-btn"
-                style="margin-top:10px;"
-                onclick="alert('Чаты скоро будут 🔥')"
-            >
-                💬 Чаты
-            </button>
+            <div
+                id="musicResults"
+                style="margin-top:15px;"
+            ></div>
 
             <button
                 class="create-btn"
@@ -140,6 +135,93 @@ function showHome(user) {
     </div>
 
     `;
+}
+
+async function searchMusic() {
+
+    const q = document
+        .getElementById("musicSearch")
+        .value
+        .trim();
+
+    if (!q) return;
+
+    const results =
+        document.getElementById("musicResults");
+
+    results.innerHTML = "Ищу...";
+
+    try {
+
+        const response = await fetch(
+            `${SERVER}/search?q=` +
+            encodeURIComponent(q)
+        );
+
+        const tracks =
+            await response.json();
+
+        if (!tracks.length) {
+
+            results.innerHTML =
+                "Ничего не найдено";
+
+            return;
+        }
+
+        results.innerHTML =
+            tracks.map(track => `
+
+            <div
+                style="
+                    background:rgba(255,255,255,.05);
+                    border-radius:12px;
+                    padding:12px;
+                    margin-top:10px;
+                "
+            >
+
+                <div style="
+                    font-weight:700;
+                    margin-bottom:5px;
+                ">
+                    ${track.title}
+                </div>
+
+                <div style="
+                    color:#8b6ba0;
+                    font-size:14px;
+                    margin-bottom:10px;
+                ">
+                    ${track.artist}
+                </div>
+
+                <button
+                    class="create-btn"
+                    onclick="openTrack('${track.id}')"
+                >
+                    ▶ Открыть
+                </button>
+
+            </div>
+
+        `).join("");
+
+    } catch {
+
+        results.innerHTML =
+            "Ошибка поиска";
+
+    }
+}
+
+function openTrack(id) {
+
+    window.open(
+        `https://www.youtube.com/watch?v=${id}`,
+        "_blank"
+    );
+
 }
 
 function logout() {
