@@ -9,7 +9,7 @@
 
 body{
     background:#1e1f22;
-    color:white;
+    color:#fff;
     min-height:100vh;
 }
 
@@ -25,14 +25,15 @@ body{
     display:flex;
     flex-direction:column;
     align-items:center;
-    padding:10px 0;
+    padding:12px 0;
     gap:12px;
+    border-right:1px solid #232428;
 }
 
 .server-logo{
     width:52px;
     height:52px;
-    border-radius:16px;
+    border-radius:18px;
     background:linear-gradient(
         135deg,
         #ff00ff,
@@ -43,6 +44,7 @@ body{
     align-items:center;
     font-size:24px;
     font-weight:800;
+    box-shadow:0 0 25px rgba(123,44,255,.4);
 }
 
 .nav-btn{
@@ -55,87 +57,148 @@ body{
     align-items:center;
     font-size:22px;
     cursor:pointer;
+    transition:.2s;
 }
 
 .nav-btn:hover{
-    background:#3b3d44;
+    border-radius:16px;
+    background:#5865f2;
+    transform:translateY(-2px);
 }
 
 .content{
     flex:1;
-    padding:20px;
     background:#313338;
+    padding:25px;
 }
 
 .content h2{
     margin-bottom:20px;
+    font-size:28px;
 }
 
 .input{
     width:100%;
     padding:14px;
     border:none;
-    border-radius:8px;
+    outline:none;
+    border-radius:10px;
     background:#1e1f22;
     color:white;
-    margin-bottom:10px;
+    margin-bottom:12px;
+    font-size:15px;
+}
+
+.input::placeholder{
+    color:#8e9297;
 }
 
 .create-btn{
     width:100%;
     padding:14px;
     border:none;
-    border-radius:8px;
+    border-radius:10px;
     background:#5865f2;
     color:white;
     font-weight:700;
     cursor:pointer;
+    transition:.2s;
+}
+
+.create-btn:hover{
+    background:#6d78f5;
 }
 
 .track{
     background:#232428;
-    padding:12px;
-    border-radius:10px;
-    margin-top:12px;
+    padding:15px;
+    border-radius:14px;
+    margin-top:14px;
+    border:1px solid #2f3136;
+    transition:.2s;
+}
+
+.track:hover{
+    transform:translateY(-2px);
+    border-color:#5865f2;
 }
 
 .track-title{
+    font-size:16px;
     font-weight:700;
     margin-bottom:6px;
 }
 
 .track-artist{
     color:#a0a0a0;
-    margin-bottom:10px;
-}
-
-iframe{
-    width:100%;
-    border:none;
-    border-radius:12px;
+    margin-bottom:12px;
 }
 
 .profile-setup{
     width:100%;
     max-width:420px;
     margin:60px auto;
+    padding:20px;
 }
 
 .logo{
     text-align:center;
-    font-size:42px;
+    font-size:52px;
     font-weight:800;
     margin-bottom:25px;
-    color:#ff00ff;
+
+    background:linear-gradient(
+        135deg,
+        #ff00ff,
+        #7b2cff
+    );
+
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
 }
 
 .setup-card{
     background:#232428;
     padding:25px;
-    border-radius:18px;
+    border-radius:20px;
+    border:1px solid #2f3136;
+    box-shadow:
+        0 10px 40px rgba(0,0,0,.4);
+}
+
+.setup-card h2{
+    text-align:center;
+    margin-bottom:20px;
 }
 
 #message{
     text-align:center;
     margin-top:15px;
+    color:#b5bac1;
+}
+
+.user-card{
+    background:#232428;
+    padding:18px;
+    border-radius:16px;
+    border:1px solid #2f3136;
+}
+
+.user-name{
+    font-size:22px;
+    font-weight:700;
+    margin-bottom:8px;
+}
+
+.user-status{
+    color:#b5bac1;
+}
+
+::-webkit-scrollbar{
+    width:8px;
+}
+
+::-webkit-scrollbar-thumb{
+    background:#444;
+    border-radius:20px;
 }
