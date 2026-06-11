@@ -212,7 +212,7 @@ async function searchMusic() {
                     class="create-btn"
                     onclick="openTrack('${track.id}')"
                 >
-                    ▶ Смотреть
+                    ▶ Открыть
                 </button>
 
             </div>
@@ -229,28 +229,11 @@ async function searchMusic() {
 
 function openTrack(id) {
 
-    document.getElementById(
-        "content"
-    ).innerHTML = `
+    window.open(
+        `https://www.youtube.com/watch?v=${id}`,
+        "_blank"
+    );
 
-        <h2>🎵 Плеер</h2>
-
-        <iframe
-            width="100%"
-            height="260"
-            src="https://www.youtube.com/embed/${id}?autoplay=1"
-            allowfullscreen
-        ></iframe>
-
-        <button
-            class="create-btn"
-            style="margin-top:15px;"
-            onclick="showMusic()"
-        >
-            Назад
-        </button>
-
-    `;
 }
 
 function showVideo() {
