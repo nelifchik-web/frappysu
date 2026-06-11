@@ -200,7 +200,7 @@ async function searchMusic() {
                     class="create-btn"
                     onclick="openTrack('${track.id}')"
                 >
-                    ▶ Открыть
+                    ▶ Смотреть
                 </button>
 
             </div>
@@ -217,10 +217,33 @@ async function searchMusic() {
 
 function openTrack(id) {
 
-    window.open(
-        `https://www.youtube.com/watch?v=${id}`,
-        "_blank"
-    );
+    const results =
+        document.getElementById("musicResults");
+
+    results.innerHTML = `
+
+        <iframe
+            width="100%"
+            height="250"
+            src="https://www.youtube.com/embed/${id}?autoplay=1"
+            frameborder="0"
+            allow="autoplay; encrypted-media"
+            allowfullscreen
+            style="
+                border:none;
+                border-radius:16px;
+            "
+        ></iframe>
+
+        <button
+            class="create-btn"
+            style="margin-top:15px;"
+            onclick="showHome(JSON.parse(localStorage.getItem('frappy_user')))"
+        >
+            ← Назад
+        </button>
+
+    `;
 
 }
 
