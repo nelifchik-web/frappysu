@@ -49,11 +49,12 @@ async function createProfile() {
             await fetch(
                 `${SERVER}/create-profile`,
                 {
-                    method:"POST",
-                    headers:{
-                        "Content-Type":"application/json"
+                    method: "POST",
+                    headers: {
+                        "Content-Type":
+                            "application/json"
                     },
-                    body:JSON.stringify({
+                    body: JSON.stringify({
                         username,
                         status
                     })
@@ -101,28 +102,28 @@ function openApp(user) {
                 class="nav-btn active"
                 onclick="showMusic(this)"
             >
-                M
+                ♪
             </div>
 
             <div
                 class="nav-btn"
                 onclick="showVideo(this)"
             >
-                V
+                ▶
             </div>
 
             <div
                 class="nav-btn"
                 onclick="showChats(this)"
             >
-                C
+                ✦
             </div>
 
             <div
                 class="nav-btn"
                 onclick="showProfile(this)"
             >
-                P
+                ⌾
             </div>
 
             <div class="profile-box">
