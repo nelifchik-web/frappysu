@@ -49,12 +49,11 @@ async function createProfile() {
             await fetch(
                 `${SERVER}/create-profile`,
                 {
-                    method: "POST",
-                    headers: {
-                        "Content-Type":
-                            "application/json"
+                    method:"POST",
+                    headers:{
+                        "Content-Type":"application/json"
                     },
-                    body: JSON.stringify({
+                    body:JSON.stringify({
                         username,
                         status
                     })
@@ -83,7 +82,6 @@ async function createProfile() {
 
         message.textContent =
             "Ошибка подключения";
-
     }
 }
 
@@ -99,76 +97,40 @@ function openApp(user) {
                 F
             </div>
 
-            <div class="nav-btn" onclick="showMusic()">
-                🎵
-            </div>
-
-            <div class="nav-btn" onclick="showVideo()">
-                🎬
-            </div>
-
-            <div class="nav-btn" onclick="showChats()">
-                💬
-            </div>
-
-            <div class="nav-btn" onclick="showProfile()">
-                👤
-            </div>
-
-        </div>
-
-        <div class="channels">
-
-            <div class="channels-header">
-                FRAPPY
+            <div
+                class="nav-btn active"
+                onclick="showMusic(this)"
+            >
+                M
             </div>
 
             <div
-                class="channel"
-                onclick="showMusic()"
+                class="nav-btn"
+                onclick="showVideo(this)"
             >
-                🎵 Музыка
+                V
             </div>
 
             <div
-                class="channel"
-                onclick="showVideo()"
+                class="nav-btn"
+                onclick="showChats(this)"
             >
-                🎬 Видео
+                C
             </div>
 
             <div
-                class="channel"
-                onclick="showChats()"
+                class="nav-btn"
+                onclick="showProfile(this)"
             >
-                💬 Чаты
+                P
             </div>
 
-            <div
-                class="channel"
-                onclick="showProfile()"
-            >
-                👤 Профиль
-            </div>
-
-            <div class="profile-panel">
+            <div class="profile-box">
 
                 <div class="avatar">
                     ${user.username
                         .charAt(0)
                         .toUpperCase()}
-                </div>
-
-                <div>
-
-                    <div class="user-name">
-                        ${user.username}
-                    </div>
-
-                    <div class="user-status">
-                        ${user.status || "Online"}
-                    </div>
-
                 </div>
 
             </div>
@@ -187,14 +149,29 @@ function openApp(user) {
     showMusic();
 }
 
-function showMusic() {
+function setActive(btn){
+
+    document
+        .querySelectorAll(".nav-btn")
+        .forEach(el =>
+            el.classList.remove("active")
+        );
+
+    if(btn){
+        btn.classList.add("active");
+    }
+}
+
+function showMusic(btn) {
+
+    setActive(btn);
 
     document.getElementById(
         "content"
     ).innerHTML = `
 
         <div class="page-title">
-            🎵 Музыка
+            Музыка
         </div>
 
         <input
@@ -260,7 +237,7 @@ async function searchMusic() {
                         class="create-btn"
                         onclick="openTrack('${track.id}')"
                     >
-                        ▶ Открыть
+                        Открыть
                     </button>
 
                 </div>
@@ -271,7 +248,6 @@ async function searchMusic() {
 
         results.innerHTML =
             "Ошибка поиска";
-
     }
 }
 
@@ -281,17 +257,18 @@ function openTrack(id) {
         `https://www.youtube.com/watch?v=${id}`,
         "_blank"
     );
-
 }
 
-function showVideo() {
+function showVideo(btn) {
+
+    setActive(btn);
 
     document.getElementById(
         "content"
     ).innerHTML = `
 
         <div class="page-title">
-            🎬 Видео
+            Видео
         </div>
 
         <div class="track">
@@ -301,14 +278,16 @@ function showVideo() {
     `;
 }
 
-function showChats() {
+function showChats(btn) {
+
+    setActive(btn);
 
     document.getElementById(
         "content"
     ).innerHTML = `
 
         <div class="page-title">
-            💬 Чаты
+            Чаты
         </div>
 
         <div class="track">
@@ -318,7 +297,9 @@ function showChats() {
     `;
 }
 
-function showProfile() {
+function showProfile(btn) {
+
+    setActive(btn);
 
     const user =
         JSON.parse(
@@ -332,7 +313,7 @@ function showProfile() {
     ).innerHTML = `
 
         <div class="page-title">
-            👤 Профиль
+            Профиль
         </div>
 
         <div class="track">
@@ -349,7 +330,7 @@ function showProfile() {
 
             <div
                 style="
-                    color:#b5bac1;
+                    color:#999;
                     margin-bottom:20px;
                 "
             >
