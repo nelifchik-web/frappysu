@@ -5,86 +5,92 @@ const createBtn = document.getElementById("createBtn");
 checkLogin();
 
 if (createBtn) {
-createBtn.addEventListener("click", createProfile);
+    createBtn.addEventListener("click", createProfile);
 }
 
 function checkLogin() {
 
-const user = localStorage.getItem("frappy_user");
+    const user =
+        localStorage.getItem(
+            "frappy_user"
+        );
 
-if (!user) return;
+    if (!user) return;
 
-openApp(JSON.parse(user));
-
+    openApp(
+        JSON.parse(user)
+    );
 }
 
 async function createProfile() {
 
-const username =
-    document.getElementById("username")
-    .value
-    .trim();
+    const username =
+        document
+        .getElementById("username")
+        .value
+        .trim();
 
-const status =
-    document.getElementById("status")
-    .value
-    .trim();
+    const status =
+        document
+        .getElementById("status")
+        .value
+        .trim();
 
-const message =
-    document.getElementById("message");
+    const message =
+        document
+        .getElementById("message");
 
-if (!username) {
-
-    message.textContent =
-        "Введи ник";
-
-    return;
-}
-
-try {
-
-    message.textContent =
-        "Создаю профиль...";
-
-    const response =
-        await fetch(
-            `${SERVER}/create-profile`,
-            {
-                method:"POST",
-                headers:{
-                    "Content-Type":"application/json"
-                },
-                body:JSON.stringify({
-                    username,
-                    status
-                })
-            }
-        );
-
-    const data =
-        await response.json();
-
-    if (!data.success) {
+    if (!username) {
 
         message.textContent =
-            data.message;
+            "Введи ник";
 
         return;
     }
 
-    localStorage.setItem(
-        "frappy_user",
-        JSON.stringify(data.user)
-    );
+    try {
 
-    openApp(data.user);
+        message.textContent =
+            "Создаю профиль...";
 
-} catch {
+        const response =
+            await fetch(
+                `${SERVER}/create-profile`,
+                {
+                    method:"POST",
+                    headers:{
+                        "Content-Type":"application/json"
+                    },
+                    body:JSON.stringify({
+                        username,
+                        status
+                    })
+                }
+            );
 
-    message.textContent =
-        "Ошибка подключения";
-}
+        const data =
+            await response.json();
 
+        if(!data.success){
+
+            message.textContent =
+                data.message;
+
+            return;
+        }
+
+        localStorage.setItem(
+            "frappy_user",
+            JSON.stringify(data.user)
+        );
+
+        openApp(data.user);
+
+    } catch {
+
+        message.textContent =
+            "Ошибка подключения";
+    }
 }
 
 function openApp(user){
@@ -96,7 +102,7 @@ document.body.innerHTML = `
     <div class="sidebar">
 
         <div class="server-logo">
-            ⚡
+            F
         </div>
 
         <div class="nav-group">
@@ -110,14 +116,14 @@ document.body.innerHTML = `
                 class="nav-btn active"
                 onclick="showMusic(this,0)"
             >
-                ♪
+                ♫
             </div>
 
             <div
                 class="nav-btn"
                 onclick="showChats(this,1)"
             >
-                💬
+                ◉
             </div>
 
             <div
@@ -178,17 +184,16 @@ const indicator =
 if(!indicator) return;
 
 indicator.style.transform =
-    `translateY(${index * 56}px)`;
-
+    `translateY(${index * 58}px)`;
 }
 
 function setActive(btn,index){
 
 document
-    .querySelectorAll(".nav-btn")
-    .forEach(el =>
-        el.classList.remove("active")
-    );
+.querySelectorAll(".nav-btn")
+.forEach(el =>
+    el.classList.remove("active")
+);
 
 if(btn){
 
@@ -196,7 +201,6 @@ if(btn){
 
     moveIndicator(index);
 }
-
 }
 
 function showMusic(btn,index){
@@ -207,96 +211,100 @@ document.getElementById(
     "content"
 ).innerHTML = `
 
-    <div class="page-title">
-        Музыка
-    </div>
+<div class="page-title">
+Музыка
+</div>
+
+<div class="topbar">
 
     <input
         id="musicSearch"
-        class="input"
+        class="search"
         placeholder="Найти трек..."
     >
 
-    <button
-        class="create-btn"
-        onclick="searchMusic()"
-    >
-        Искать
-    </button>
+</div>
 
-    <div id="musicResults"></div>
+<button
+    class="create-btn"
+    onclick="searchMusic()"
+>
+Искать
+</button>
+
+<div id="musicResults"></div>
 
 `;
-
 }
 
 async function searchMusic(){
 
 const q =
-    document.getElementById(
-        "musicSearch"
-    ).value.trim();
+document
+.getElementById(
+    "musicSearch"
+)
+.value
+.trim();
 
 if(!q) return;
 
 const results =
-    document.getElementById(
-        "musicResults"
-    );
+document.getElementById(
+    "musicResults"
+);
 
 results.innerHTML =
-    "Поиск...";
+"Поиск...";
 
 try{
 
-    const response =
-        await fetch(
-            `${SERVER}/search?q=` +
-            encodeURIComponent(q)
-        );
+const response =
+await fetch(
+`${SERVER}/search?q=` +
+encodeURIComponent(q)
+);
 
-    const tracks =
-        await response.json();
+const tracks =
+await response.json();
 
-    results.innerHTML =
-        tracks.map(track => `
+results.innerHTML =
+tracks.map(track => `
 
-        <div class="track">
+<div class="track">
 
-            <div class="track-title">
-                ${track.title}
-            </div>
+    <div class="track-title">
+        ${track.title}
+    </div>
 
-            <div class="track-artist">
-                ${track.artist}
-            </div>
+    <div class="track-artist">
+        ${track.artist}
+    </div>
 
-            <button
-                class="create-btn"
-                onclick="openTrack('${track.id}')"
-            >
-                Открыть
-            </button>
+    <button
+        class="create-btn"
+        onclick="openTrack('${track.id}')"
+    >
+        Открыть
+    </button>
 
-        </div>
+</div>
 
-        `).join("");
+`).join("");
 
 }catch{
 
-    results.innerHTML =
-        "Ошибка поиска";
+results.innerHTML =
+"Ошибка поиска";
 }
-
 }
 
 function openTrack(id){
 
 window.open(
-    "https://www.youtube.com/watch?v=" + id,
-    "_blank"
+`https://www.youtube.com/watch?v=${id}`,
+"_blank"
 );
-
 }
 
 function showChats(btn,index){
@@ -304,23 +312,22 @@ function showChats(btn,index){
 setActive(btn,index);
 
 document.getElementById(
-    "content"
+"content"
 ).innerHTML = `
 
-    <div class="page-title">
-        Чаты
-    </div>
+<div class="page-title">
+Чаты
+</div>
 
-    <div class="track">
-        Личные сообщения скоро появятся
-    </div>
+<div class="track">
+Личные сообщения скоро появятся
+</div>
 
-    <div class="track">
-        Групповые чаты в разработке
-    </div>
+<div class="track">
+Групповые чаты в разработке
+</div>
 
 `;
-
 }
 
 function showVideo(btn,index){
@@ -328,72 +335,70 @@ function showVideo(btn,index){
 setActive(btn,index);
 
 document.getElementById(
-    "content"
+"content"
 ).innerHTML = `
 
-    <div class="page-title">
-        Видео
-    </div>
+<div class="page-title">
+Видео
+</div>
 
-    <div class="track">
-        Видео-раздел находится в разработке
-    </div>
+<div class="track">
+Видео-раздел находится в разработке
+</div>
 
 `;
-
 }
 
 function showProfile(){
 
 const user =
-    JSON.parse(
-        localStorage.getItem(
-            "frappy_user"
-        )
-    );
+JSON.parse(
+localStorage.getItem(
+    "frappy_user"
+)
+);
 
 document.getElementById(
-    "content"
+"content"
 ).innerHTML = `
 
-    <div class="page-title">
-        Профиль
+<div class="page-title">
+Профиль
+</div>
+
+<div class="track">
+
+    <div style="
+        font-size:28px;
+        font-weight:800;
+        margin-bottom:10px;
+    ">
+        ${user.username}
     </div>
 
-    <div class="track">
-
-        <div style="
-            font-size:28px;
-            font-weight:800;
-            margin-bottom:10px;
-        ">
-            ${user.username}
-        </div>
-
-        <div style="
-            color:#999;
-            margin-bottom:20px;
-        ">
-            ${user.status || "Без статуса"}
-        </div>
-
-        <button
-            class="create-btn"
-            onclick="logout()"
-        >
-            Выйти
-        </button>
-
+    <div style="
+        color:#999;
+        margin-bottom:20px;
+    ">
+        ${user.status || "Без статуса"}
     </div>
+
+    <button
+        class="create-btn"
+        onclick="logout()"
+    >
+        Выйти
+    </button>
+
+</div>
 
 `;
-
 }
 
 function logout(){
 
 localStorage.removeItem(
-    "frappy_user"
+"frappy_user"
 );
 
 location.reload();

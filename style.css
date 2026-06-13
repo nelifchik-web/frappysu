@@ -22,9 +22,9 @@ height:100vh;
 /* SIDEBAR */
 
 .sidebar{
-width:82px;
+width:84px;
 background:#080808;
-border-right:1px solid #171717;
+border-right:1px solid #151515;
 display:flex;
 flex-direction:column;
 align-items:center;
@@ -35,22 +35,35 @@ padding:12px 0;
 width:52px;
 height:52px;
 border-radius:18px;
-background:linear-gradient(135deg,#ff00ff,#7b2cff);
+
 display:flex;
-align-items:center;
 justify-content:center;
+align-items:center;
+
 font-size:24px;
 font-weight:800;
+
+background:linear-gradient(
+135deg,
+#ff00ff,
+#7b2cff
+);
+
 box-shadow:
-0 0 20px rgba(184,108,255,.35);
-margin-bottom:16px;
+0 0 25px rgba(184,108,255,.35);
+
+margin-bottom:18px;
 }
 
 .nav-group{
+
 position:relative;
+
 padding:8px;
+
 display:flex;
 flex-direction:column;
+
 gap:8px;
 
 border-radius:24px;
@@ -59,76 +72,77 @@ background:rgba(255,255,255,.03);
 
 backdrop-filter:blur(20px);
 
-border:1px solid rgba(255,255,255,.05);
+border:1px solid rgba(255,255,255,.06);
 }
 
 .nav-indicator{
+
 position:absolute;
 
 left:8px;
 top:8px;
 
-width:48px;
-height:48px;
+width:50px;
+height:50px;
 
 border-radius:16px;
 
 background:rgba(255,255,255,.08);
 
-border:1px solid rgba(255,255,255,.15);
+border:1px solid rgba(255,255,255,.14);
 
 backdrop-filter:blur(20px);
 
 transition:.25s ease;
+
+pointer-events:none;
 }
 
 .nav-btn{
-position:relative;
-z-index:2;
 
-width:48px;
-height:48px;
+width:50px;
+height:50px;
 
 display:flex;
 justify-content:center;
 align-items:center;
 
-border-radius:16px;
+position:relative;
+z-index:2;
 
 cursor:pointer;
+
+border-radius:16px;
 
 font-size:18px;
 
 color:#b86cff;
-
-transition:.2s;
-}
-
-.nav-btn:hover{
-transform:translateY(-2px);
 }
 
 .nav-btn.active{
-color:#fff;
+color:white;
 }
 
-/* PROFILE */
-
 .profile-box{
-margin-top:auto;
 
-padding:12px 4px;
+margin-top:auto;
 
 width:100%;
 
-text-align:center;
+padding:12px 6px;
+
+display:flex;
+flex-direction:column;
+
+align-items:center;
 
 cursor:pointer;
 }
 
 .avatar{
-width:42px;
-height:42px;
+
+width:44px;
+height:44px;
 
 border-radius:50%;
 
@@ -139,30 +153,30 @@ background:linear-gradient(
 );
 
 display:flex;
-align-items:center;
 justify-content:center;
+align-items:center;
 
-font-size:15px;
 font-weight:700;
-
-margin:auto;
 }
 
 .profile-name{
+
 font-size:10px;
-font-weight:600;
 
 margin-top:6px;
 
-white-space:nowrap;
+max-width:70px;
+
 overflow:hidden;
 text-overflow:ellipsis;
+white-space:nowrap;
 }
 
 .profile-status{
+
 font-size:9px;
-color:#66ff99;
-margin-top:2px;
+
+color:#63ff8c;
 }
 
 /* CONTENT */
@@ -173,37 +187,73 @@ padding:24px;
 overflow:auto;
 }
 
-.page-title{
-font-size:30px;
-font-weight:800;
-margin-bottom:18px;
+.topbar{
+
+width:100%;
+
+max-width:700px;
+
+margin-bottom:20px;
 }
 
-.input{
-width:100%;
-max-width:520px;
+.search{
 
-padding:14px;
+width:100%;
+
+padding:16px;
 
 border:none;
 outline:none;
 
-border-radius:14px;
+border-radius:18px;
 
-background:#111;
+background:#101010;
 
-color:#fff;
+color:white;
 
 font-size:15px;
 
-margin-bottom:12px;
+border:1px solid #1d1d1d;
+}
+
+.page-title{
+
+font-size:34px;
+font-weight:800;
+
+margin-bottom:20px;
+}
+
+.track{
+
+background:rgba(255,255,255,.03);
+
+border:1px solid rgba(255,255,255,.06);
+
+backdrop-filter:blur(20px);
+
+padding:16px;
+
+border-radius:18px;
+
+margin-top:12px;
+}
+
+.track-title{
+font-size:16px;
+font-weight:700;
+}
+
+.track-artist{
+margin-top:4px;
+color:#999;
 }
 
 .create-btn{
-width:100%;
-max-width:520px;
 
-padding:14px;
+margin-top:12px;
+
+padding:12px 16px;
 
 border:none;
 
@@ -222,37 +272,13 @@ background:linear-gradient(
 );
 }
 
-.track{
-margin-top:12px;
-
-background:#101010;
-
-border:1px solid #1d1d1d;
-
-border-radius:14px;
-
-padding:15px;
-}
-
-.track-title{
-font-size:15px;
-font-weight:700;
-margin-bottom:4px;
-}
-
-.track-artist{
-color:#888;
-}
-
 /* LOGIN */
 
 .logo{
-font-size:52px;
+font-size:56px;
 font-weight:800;
-
 text-align:center;
-
-margin-bottom:20px;
+margin-bottom:24px;
 
 background:linear-gradient(
 135deg,
@@ -265,23 +291,42 @@ background:linear-gradient(
 }
 
 .setup-card{
+
 background:#111;
 
 border:1px solid #222;
 
-border-radius:20px;
+border-radius:24px;
 
 padding:24px;
 }
 
 .profile-setup{
-max-width:480px;
-margin:50px auto;
+max-width:500px;
+margin:60px auto;
 padding:20px;
 }
 
+.input{
+
+width:100%;
+
+padding:15px;
+
+margin-bottom:12px;
+
+border:none;
+outline:none;
+
+border-radius:16px;
+
+background:#101010;
+
+color:white;
+}
+
 #message{
-margin-top:12px;
 text-align:center;
+margin-top:12px;
 color:#999;
 }
