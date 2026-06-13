@@ -99,40 +99,53 @@ document.body.innerHTML = `
             ⚡
         </div>
 
-        <div
-            class="nav-btn active"
-            onclick="showMusic(this)"
-        >
-            ♪
+        <div class="nav-group">
+
+            <div
+                class="nav-indicator"
+                id="navIndicator"
+            ></div>
+
+            <div
+                class="nav-btn active"
+                onclick="showMusic(this,0)"
+            >
+                ♪
+            </div>
+
+            <div
+                class="nav-btn"
+                onclick="showChats(this,1)"
+            >
+                💬
+            </div>
+
+            <div
+                class="nav-btn"
+                onclick="showVideo(this,2)"
+            >
+                ▶
+            </div>
+
         </div>
 
         <div
-            class="nav-btn"
-            onclick="showChats(this)"
+            class="profile-box"
+            onclick="showProfile()"
         >
-            💬
-        </div>
-
-        <div
-            class="nav-btn"
-            onclick="showVideo(this)"
-        >
-            ▶
-        </div>
-
-        <div
-            class="nav-btn"
-            onclick="showProfile(this)"
-        >
-            👤
-        </div>
-
-        <div class="profile-box">
 
             <div class="avatar">
                 ${user.username
                     .charAt(0)
                     .toUpperCase()}
+            </div>
+
+            <div class="profile-name">
+                ${user.username}
+            </div>
+
+            <div class="profile-status">
+                ● Online
             </div>
 
         </div>
@@ -148,11 +161,28 @@ document.body.innerHTML = `
 
 `;
 
-showMusic();
+showMusic(
+    document.querySelector(".nav-btn"),
+    0
+);
 
 }
 
-function setActive(btn){
+function moveIndicator(index){
+
+const indicator =
+    document.getElementById(
+        "navIndicator"
+    );
+
+if(!indicator) return;
+
+indicator.style.transform =
+    `translateY(${index * 56}px)`;
+
+}
+
+function setActive(btn,index){
 
 document
     .querySelectorAll(".nav-btn")
@@ -161,14 +191,17 @@ document
     );
 
 if(btn){
+
     btn.classList.add("active");
+
+    moveIndicator(index);
 }
 
 }
 
-function showMusic(btn){
+function showMusic(btn,index){
 
-setActive(btn);
+setActive(btn,index);
 
 document.getElementById(
     "content"
@@ -260,15 +293,15 @@ try{
 function openTrack(id){
 
 window.open(
-    `https://www.youtube.com/watch?v=${id}`,
+    "https://www.youtube.com/watch?v=" + id,
     "_blank"
 );
 
 }
 
-function showChats(btn){
+function showChats(btn,index){
 
-setActive(btn);
+setActive(btn,index);
 
 document.getElementById(
     "content"
@@ -290,9 +323,9 @@ document.getElementById(
 
 }
 
-function showVideo(btn){
+function showVideo(btn,index){
 
-setActive(btn);
+setActive(btn,index);
 
 document.getElementById(
     "content"
@@ -310,9 +343,7 @@ document.getElementById(
 
 }
 
-function showProfile(btn){
-
-setActive(btn);
+function showProfile(){
 
 const user =
     JSON.parse(
