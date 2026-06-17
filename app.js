@@ -2,7 +2,6 @@ const SERVER = "https://frappy-server.onrender.com";
 
 let currentUser = null;
 
-// Инициализация
 document.addEventListener("DOMContentLoaded", () => {
     checkLogin();
 });
@@ -28,7 +27,7 @@ function showProfileSetup() {
                 <input type="text" id="status" class="input" placeholder="Статус (необязательно)">
                 
                 <button id="createBtn" class="create-btn">Создать профиль</button>
-                <div id="message"></div>
+                <div id="message" style="margin-top:15px;color:#ff6666;"></div>
             </div>
         </div>
     `;
@@ -66,7 +65,7 @@ async function createProfile() {
         currentUser = data.user;
         openApp();
     } catch (e) {
-        messageEl.textContent = "Ошибка сервера";
+        messageEl.textContent = "Ошибка подключения к серверу";
     }
 }
 
@@ -82,9 +81,9 @@ function openApp() {
                     <div class="nav-btn" onclick="switchTab(2)">▶</div>
                 </div>
 
-                <div class="profile-box" onclick="showProfile()">
-                    <div class="avatar">${currentUser.username[0].toUpperCase()}</div>
-                    <div class="profile-name">${currentUser.username}</div>
+                <div onclick="showProfile()" style="margin-top:auto;cursor:pointer;text-align:center;">
+                    <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#b86cff,#7b2cff);margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-weight:700;">${currentUser.username[0].toUpperCase()}</div>
+                    <div style="font-size:12px;">${currentUser.username}</div>
                 </div>
             </div>
 
@@ -95,7 +94,6 @@ function openApp() {
     showMusic();
 }
 
-// Переключение вкладок
 function switchTab(tab) {
     if (tab === 0) showMusic();
     else if (tab === 1) showChats();
@@ -112,7 +110,7 @@ function showMusic() {
         </div>
         
         <div id="musicResults"></div>
-        <div id="playerContainer" style="margin-top: 30px; display: none;"></div>
+        <div id="playerContainer" style="margin-top:30px;display:none;"></div>
     `;
 }
 
@@ -121,73 +119,56 @@ async function searchMusic() {
     if (!query) return;
 
     const resultsContainer = document.getElementById("musicResults");
-    resultsContainer.innerHTML = "<p>Ищем...</p>";
+    resultsContainer.innerHTML = "<p style='color:#b86cff'>Загружаем треки...</p>";
 
     try {
-        const res = await fetch(`\( {SERVER}/search?q= \){encodeURIComponent(query)}`);
+        const res = await fetch(`${SERVER}/search?q=` + encodeURIComponent(query));
+        
         const tracks = await res.json();
 
-        if (tracks.length === 0) {
-            resultsContainer.innerHTML = "<p>Ничего не найдено</p>";
-            return;
-        }
-
-        let html = "";
-        tracks.forEach(track => {
-            html += `
-                <div class="track" onclick="playTrack('\( {track.id}', ' \){track.title.replace(/'/g, "\\'")}', '${track.artist.replace(/'/g, "\\'")}')">
-                    <div class="track-info">
-                        <div class="track-title">${track.title}</div>
-                        <div class="track-artist">${track.artist}</div>
+        if (tracks && tracks.length > 0) {
+            let html = "";
+            tracks.forEach(track => {
+                html += `
+                    <div class="track" onclick="playTrack('\( {track.id}', ' \){(track.title || '').replace(/'/g, "\\'")}', '${(track.artist || '').replace(/'/g, "\\'")}')">
+                        <div class="track-info">
+                            <div class="track-title">${track.title || 'Без названия'}</div>
+                            <div class="track-artist">${track.artist || 'Неизвестный'}</div>
+                        </div>
                     </div>
-                </div>
-            `;
-        });
-
-        resultsContainer.innerHTML = html;
+                `;
+            });
+            resultsContainer.innerHTML = html;
+        } else {
+            resultsContainer.innerHTML = "<p>Ничего не найдено</p>";
+        }
     } catch (e) {
-        resultsContainer.innerHTML = "<p>Ошибка поиска</p>";
+        resultsContainer.innerHTML = `<p style="color:#ff6666">Ошибка подключения.<br>Сервер не отвечает.</p>`;
     }
 }
 
 function playTrack(videoId, title, artist) {
-    const playerContainer = document.getElementById("playerContainer");
-    
-    playerContainer.style.display = "block";
-    playerContainer.innerHTML = `
-        <h3 style="margin-bottom: 12px;">Сейчас играет</h3>
-        <div style="position: relative; padding-top: 56.25%; background: #000; border-radius: 16px; overflow: hidden;">
-            <iframe 
-                width="100%" 
-                height="100%" 
-                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
-                src="https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1" 
-                frameborder="0" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                allowfullscreen>
-            </iframe>
+    const container = document.getElementById("playerContainer");
+    container.style.display = "block";
+    container.innerHTML = `
+        <h3 style="margin-bottom:12px;color:#b86cff">Сейчас играет</h3>
+        <div style="position:relative;padding-top:56.25%;background:#000;border-radius:16px;overflow:hidden;">
+            <iframe width="100%" height="100%" style="position:absolute;top:0;left:0;width:100%;height:100%;" 
+                src="https://www.youtube.com/embed/${videoId}?autoplay=1" 
+                frameborder="0" allowfullscreen></iframe>
         </div>
-        <div style="margin-top: 12px; font-weight: 700;">${title}</div>
-        <div style="color: #999;">${artist}</div>
+        <div style="margin-top:12px;font-weight:700;">${title}</div>
+        <div style="color:#999;">${artist}</div>
     `;
-
-    // Скролл к плееру
-    playerContainer.scrollIntoView({ behavior: "smooth" });
+    container.scrollIntoView({ behavior: "smooth" });
 }
 
-// Заглушки для других разделов
 function showChats() {
-    document.getElementById("content").innerHTML = `
-        <div class="page-title">Чаты</div>
-        <div class="track">Личные сообщения и групповые чаты — скоро</div>
-    `;
+    document.getElementById("content").innerHTML = `<div class="page-title">Чаты</div><div class="track">Скоро...</div>`;
 }
 
 function showVideo() {
-    document.getElementById("content").innerHTML = `
-        <div class="page-title">Видео</div>
-        <div class="track">Видеокомнаты и лента — в разработке</div>
-    `;
+    document.getElementById("content").innerHTML = `<div class="page-title">Видео</div><div class="track">Скоро...</div>`;
 }
 
 function showProfile() {
@@ -196,7 +177,7 @@ function showProfile() {
         <div class="track">
             <h3>${currentUser.username}</h3>
             <p>${currentUser.status || "Без статуса"}</p>
-            <button class="create-btn" onclick="logout()" style="margin-top: 20px;">Выйти</button>
+            <button class="create-btn" onclick="logout()" style="margin-top:20px;">Выйти</button>
         </div>
     `;
 }
