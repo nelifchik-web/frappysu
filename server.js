@@ -9,7 +9,7 @@ app.use(express.json());
 const USERS_FILE = "./users.json";
 const YOUTUBE_API_KEY = "AIzaSyDW1cbsx1G-w6ogFtBI_tEvjpvk5bRuwzU";
 
-// ==================== USERS ====================
+// USERS
 function getUsers() {
     try {
         return JSON.parse(fs.readFileSync(USERS_FILE, "utf8"));
@@ -43,7 +43,7 @@ app.post("/create-profile", (req, res) => {
     res.json({ success: true, user });
 });
 
-// ==================== MUSIC SEARCH ====================
+// MUSIC SEARCH
 app.get("/search", async (req, res) => {
     const q = req.query.q;
     if (!q) return res.json([]);
