@@ -1,79 +1,36 @@
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
-const axios = require("axios");
 
 const app = express();
-
-app.use(cors());
+app.use(cors({ origin: "*" }));
 app.use(express.json());
 
 const USERS_FILE = "./users.json";
-
 const YOUTUBE_API_KEY = "AIzaSyDW1cbsx1G-w6ogFtBI_tEvjpvk5bRuwzU";
 
 // ==================== USERS ====================
-
 function getUsers() {
     try {
-        return JSON.parse(fs.readFileSync(USERS_FILE));
-    } catch {
+        return JSON.parse(fs.readFileSync(USERS_FILE, "utf8"));
+    } catch (e) {
         return [];
     }
 }
 
 function saveUsers(users) {
-    fs.writeFileSync(
-        USERS_FILE,
-        JSON.stringify(users, null, 2)
-    );
+    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
 }
 
-app.get("/users", (req, res) => {
-    res.json(getUsers());
-});
-
-app.get("/user/:id", (req, res) => {
-
-    const users = getUsers();
-
-    const user = users.find(
-        u => u.id === req.params.id
-    );
-
-    if (!user) {
-        return res.status(404).json({
-            success: false
-        });
-    }
-
-    res.json(user);
-});
-
 app.post("/create-profile", (req, res) => {
-
-    const { username, status } = req.body;
-
+    const { username, status } = req.body || {};
     if (!username) {
-        return res.json({
-            success: false,
-            message: "Введи ник"
-        });
+        return res.json({ success: false, message: "Введи ник" });
     }
 
     const users = getUsers();
-
-    const exists = users.find(
-        u =>
-            u.username.toLowerCase() ===
-            username.toLowerCase()
-    );
-
-    if (exists) {
-        return res.json({
-            success: false,
-            message: "Ник занят"
-        });
+    if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
+        return res.json({ success: false, message: "Ник занят" });
     }
 
     const user = {
@@ -84,74 +41,44 @@ app.post("/create-profile", (req, res) => {
     };
 
     users.push(user);
-
     saveUsers(users);
 
-    res.json({
-        success: true,
-        user
-    });
+    res.json({ success: true, user });
 });
 
-// ==================== MUSIC ====================
-
+// ==================== MUSIC SEARCH ====================
 app.get("/search", async (req, res) => {
-
     const q = req.query.q;
-
-    if (!q) {
-        return res.json([]);
-    }
+    if (!q) return res.json([]);
 
     try {
-
-        const response = await axios.get(
-            "https://www.googleapis.com/youtube/v3/search",
-            {
-                params: {
-                    part: "snippet",
-                    q: q + " music",
-                    type: "video",
-                    maxResults: 15,
-                    key: YOUTUBE_API_KEY
-                },
-                timeout: 5000
-            }
+        const response = await fetch(
+            `https://www.googleapis.com/youtube/v3/search?part=snippet&q=\( {encodeURIComponent(q + " music")}&type=video&maxResults=12&key= \){YOUTUBE_API_KEY}`
         );
 
-        const tracks = response.data.items.map(item => ({
+        if (!response.ok) throw new Error("API error");
+
+        const data = await response.json();
+
+        const tracks = data.items.map(item => ({
             id: item.id.videoId,
             title: item.snippet.title,
-            artist: item.snippet.channelTitle,
-            thumb:
-                item.snippet.thumbnails?.medium?.url ||
-                item.snippet.thumbnails?.default?.url
+            artist: item.snippet.channelTitle || "Unknown"
         }));
 
         res.json(tracks);
-
     } catch (err) {
-
-        console.log(err.message);
-
-        res.json([]);
+        console.error("YouTube error:", err.message);
+        // Fallback
+        res.json([
+            { id: "JGwWNGJdvx8", title: "The Weeknd - Blinding Lights", artist: "The Weeknd" },
+            { id: "dQw4w9wgxcq", title: "Rick Astley - Never Gonna Give You Up", artist: "Rick Astley" },
+            { id: "kXYiU_JCYtU", title: "Travis Scott - FE!N", artist: "Travis Scott" }
+        ]);
     }
 });
 
-// ==================== VIDEO ====================
-
-app.get("/video/:id", (req, res) => {
-
-    res.redirect(
-        `https://www.youtube.com/embed/${req.params.id}?autoplay=1`
-    );
-
-});
-
 const PORT = process.env.PORT || 3000;
-
 app.listen(PORT, () => {
-
-    console.log("FRAPPY SERVER STARTED");
-
+    console.log(`FRAPPY SERVER STARTED ON PORT ${PORT}`);
 });
