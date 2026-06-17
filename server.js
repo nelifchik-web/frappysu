@@ -1,7 +1,6 @@
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
-const axios = require("axios");
 
 const app = express();
 app.use(cors({ origin: "*" }));
@@ -10,7 +9,7 @@ app.use(express.json());
 const USERS_FILE = "./users.json";
 const YOUTUBE_API_KEY = "AIzaSyDW1cbsx1G-w6ogFtBI_tEvjpvk5bRuwzU";
 
-// ==================== USERS ====================
+// USERS
 function getUsers() {
     try {
         return JSON.parse(fs.readFileSync(USERS_FILE, "utf8"));
@@ -44,24 +43,21 @@ app.post("/create-profile", (req, res) => {
     res.json({ success: true, user });
 });
 
-// ==================== MUSIC SEARCH ====================
+// SEARCH
 app.get("/search", async (req, res) => {
     const q = req.query.q;
     if (!q) return res.json([]);
 
     try {
-        const response = await axios.get("https://www.googleapis.com/youtube/v3/search", {
-            params: {
-                part: "snippet",
-                q: q + " music",
-                type: "video",
-                maxResults: 12,
-                key: YOUTUBE_API_KEY
-            },
-            timeout: 8000
-        });
+        const response = await fetch(
+            `https://www.googleapis.com/youtube/v3/search?part=snippet&q=\( {encodeURIComponent(q + " music")}&type=video&maxResults=12&key= \){YOUTUBE_API_KEY}`
+        );
 
-        const tracks = response.data.items.map(item => ({
+        if (!response.ok) throw new Error("API error");
+
+        const data = await response.json();
+
+        const tracks = data.items.map(item => ({
             id: item.id.videoId,
             title: item.snippet.title,
             artist: item.snippet.channelTitle || "Unknown"
@@ -69,8 +65,7 @@ app.get("/search", async (req, res) => {
 
         res.json(tracks);
     } catch (err) {
-        console.error("YouTube Error:", err.message);
-        // Хороший fallback
+        console.error("YouTube error:", err.message);
         res.json([
             { id: "JGwWNGJdvx8", title: "The Weeknd - Blinding Lights", artist: "The Weeknd" },
             { id: "dQw4w9wgxcq", title: "Rick Astley - Never Gonna Give You Up", artist: "Rick Astley" },
@@ -80,4 +75,4 @@ app.get("/search", async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`FRAPPY SERVER RUNNING ON ${PORT}`));
+app.listen(PORT, () => console.log(`FRAPPY SERVER STARTED ON ${PORT}`));
