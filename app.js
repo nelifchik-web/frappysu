@@ -72,7 +72,7 @@ function openApp() {
             </div>
             <div class="content" id="content"></div>
         </div>
-        <div id="miniPlayer" style="display:none; position:fixed; bottom:0; left:0; right:0; background:rgba(10,10,10,0.98); border-top:2px solid #b86cff; padding:12px 16px; z-index:1000; box-shadow:0 -4px 20px rgba(0,0,0,0.6);"></div>
+        <div id="miniPlayer" style="display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,10,0.98);border-top:2px solid #b86cff;padding:12px 16px;z-index:1000;"></div>
     `;
     showMusic();
 }
@@ -100,7 +100,7 @@ async function searchMusic() {
     if (!query) return;
 
     const container = document.getElementById("musicResults");
-    container.innerHTML = `<p style="color:#b86cff">Поиск треков...</p>`;
+    container.innerHTML = `<p style="color:#b86cff">Поиск...</p>`;
 
     try {
         const res = await fetch(`${SERVER}/search?q=` + encodeURIComponent(query));
@@ -128,23 +128,22 @@ function playTrack(videoId, title, artist) {
     mini.style.display = "block";
     mini.innerHTML = `
         <div style="display:flex;align-items:center;gap:16px;">
-            <div style="flex:1; min-width:0;">
-                <div style="font-weight:700; font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${title}</div>
-                <div style="color:#aaa; font-size:14px;">${artist}</div>
+            <div style="flex:1;">
+                <div style="font-weight:700;">${title}</div>
+                <div style="color:#aaa;">${artist}</div>
             </div>
-            <button onclick="toggleMiniPlayer(this)" style="background:#b86cff; color:white; border:none; width:52px; height:52px; border-radius:50%; font-size:22px; flex-shrink:0;">▶</button>
+            <button onclick="togglePlay(this)" style="background:#b86cff;color:white;border:none;width:56px;height:56px;border-radius:50%;font-size:24px;">▶</button>
         </div>
-        <iframe id="ytEmbed" width="100%" height="0" style="margin-top:12px; border-radius:12px; display:none;" 
-            src="https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1" 
-            frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <iframe id="ytPlayer" width="100%" height="0" style="margin-top:12px;display:none;border-radius:12px;" 
+            src="https://www.youtube.com/embed/${videoId}?autoplay=1" frameborder="0" allowfullscreen></iframe>
     `;
 }
 
-function toggleMiniPlayer(btn) {
-    const iframe = document.getElementById("ytEmbed");
+function togglePlay(btn) {
+    const iframe = document.getElementById("ytPlayer");
     if (iframe.style.display === "none") {
         iframe.style.display = "block";
-        iframe.height = "200";
+        iframe.height = "220";
         btn.textContent = "❚❚";
     } else {
         iframe.style.display = "none";
@@ -154,11 +153,11 @@ function toggleMiniPlayer(btn) {
 }
 
 function showChats() {
-    document.getElementById("content").innerHTML = `<div class="page-title">Чаты</div><div class="track">Скоро будет</div>`;
+    document.getElementById("content").innerHTML = `<div class="page-title">Чаты</div><div class="track">Скоро...</div>`;
 }
 
 function showVideo() {
-    document.getElementById("content").innerHTML = `<div class="page-title">Видео</div><div class="track">Скоро будет</div>`;
+    document.getElementById("content").innerHTML = `<div class="page-title">Видео</div><div class="track">Скоро...</div>`;
 }
 
 function showProfile() {
