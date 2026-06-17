@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
+const axios = require("axios");
 
 const app = express();
 app.use(cors({ origin: "*" }));
@@ -13,7 +14,7 @@ const YOUTUBE_API_KEY = "AIzaSyDW1cbsx1G-w6ogFtBI_tEvjpvk5bRuwzU";
 function getUsers() {
     try {
         return JSON.parse(fs.readFileSync(USERS_FILE, "utf8"));
-    } catch (e) {
+    } catch {
         return [];
     }
 }
@@ -24,9 +25,7 @@ function saveUsers(users) {
 
 app.post("/create-profile", (req, res) => {
     const { username, status } = req.body || {};
-    if (!username) {
-        return res.json({ success: false, message: "Введи ник" });
-    }
+    if (!username) return res.json({ success: false, message: "Введи ник" });
 
     const users = getUsers();
     if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
@@ -42,7 +41,6 @@ app.post("/create-profile", (req, res) => {
 
     users.push(user);
     saveUsers(users);
-
     res.json({ success: true, user });
 });
 
@@ -52,15 +50,18 @@ app.get("/search", async (req, res) => {
     if (!q) return res.json([]);
 
     try {
-        const response = await fetch(
-            `https://www.googleapis.com/youtube/v3/search?part=snippet&q=\( {encodeURIComponent(q + " music")}&type=video&maxResults=12&key= \){YOUTUBE_API_KEY}`
-        );
+        const response = await axios.get("https://www.googleapis.com/youtube/v3/search", {
+            params: {
+                part: "snippet",
+                q: q + " music",
+                type: "video",
+                maxResults: 12,
+                key: YOUTUBE_API_KEY
+            },
+            timeout: 8000
+        });
 
-        if (!response.ok) throw new Error("API error");
-
-        const data = await response.json();
-
-        const tracks = data.items.map(item => ({
+        const tracks = response.data.items.map(item => ({
             id: item.id.videoId,
             title: item.snippet.title,
             artist: item.snippet.channelTitle || "Unknown"
@@ -68,8 +69,8 @@ app.get("/search", async (req, res) => {
 
         res.json(tracks);
     } catch (err) {
-        console.error("YouTube error:", err.message);
-        // Fallback
+        console.error("YouTube Error:", err.message);
+        // Хороший fallback
         res.json([
             { id: "JGwWNGJdvx8", title: "The Weeknd - Blinding Lights", artist: "The Weeknd" },
             { id: "dQw4w9wgxcq", title: "Rick Astley - Never Gonna Give You Up", artist: "Rick Astley" },
@@ -79,6 +80,4 @@ app.get("/search", async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`FRAPPY SERVER STARTED ON PORT ${PORT}`);
-});
+app.listen(PORT, () => console.log(`FRAPPY SERVER RUNNING ON ${PORT}`));
