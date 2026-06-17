@@ -1,406 +1,207 @@
 const SERVER = "https://frappy-server.onrender.com";
 
-const createBtn = document.getElementById("createBtn");
+let currentUser = null;
 
-checkLogin();
-
-if (createBtn) {
-    createBtn.addEventListener("click", createProfile);
-}
+// Инициализация
+document.addEventListener("DOMContentLoaded", () => {
+    checkLogin();
+});
 
 function checkLogin() {
+    const userData = localStorage.getItem("frappy_user");
+    if (userData) {
+        currentUser = JSON.parse(userData);
+        openApp();
+    } else {
+        showProfileSetup();
+    }
+}
 
-    const user =
-        localStorage.getItem(
-            "frappy_user"
-        );
+function showProfileSetup() {
+    document.getElementById("root").innerHTML = `
+        <div class="profile-setup">
+            <div class="setup-card">
+                <div class="logo">FRAPPY</div>
+                <h2>Создай профиль</h2>
+                
+                <input type="text" id="username" class="input" placeholder="Уникальный ник">
+                <input type="text" id="status" class="input" placeholder="Статус (необязательно)">
+                
+                <button id="createBtn" class="create-btn">Создать профиль</button>
+                <div id="message"></div>
+            </div>
+        </div>
+    `;
 
-    if (!user) return;
-
-    openApp(
-        JSON.parse(user)
-    );
+    document.getElementById("createBtn").addEventListener("click", createProfile);
 }
 
 async function createProfile() {
-
-    const username =
-        document
-        .getElementById("username")
-        .value
-        .trim();
-
-    const status =
-        document
-        .getElementById("status")
-        .value
-        .trim();
-
-    const message =
-        document
-        .getElementById("message");
+    const username = document.getElementById("username").value.trim();
+    const status = document.getElementById("status").value.trim();
+    const messageEl = document.getElementById("message");
 
     if (!username) {
-
-        message.textContent =
-            "Введи ник";
-
+        messageEl.textContent = "Введи ник!";
         return;
     }
 
+    messageEl.textContent = "Создаём...";
+
     try {
+        const res = await fetch(`${SERVER}/create-profile`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, status })
+        });
 
-        message.textContent =
-            "Создаю профиль...";
+        const data = await res.json();
 
-        const response =
-            await fetch(
-                `${SERVER}/create-profile`,
-                {
-                    method:"POST",
-                    headers:{
-                        "Content-Type":"application/json"
-                    },
-                    body:JSON.stringify({
-                        username,
-                        status
-                    })
-                }
-            );
-
-        const data =
-            await response.json();
-
-        if(!data.success){
-
-            message.textContent =
-                data.message;
-
+        if (!data.success) {
+            messageEl.textContent = data.message || "Ошибка";
             return;
         }
 
-        localStorage.setItem(
-            "frappy_user",
-            JSON.stringify(data.user)
-        );
-
-        openApp(data.user);
-
-    } catch {
-
-        message.textContent =
-            "Ошибка подключения";
+        localStorage.setItem("frappy_user", JSON.stringify(data.user));
+        currentUser = data.user;
+        openApp();
+    } catch (e) {
+        messageEl.textContent = "Ошибка сервера";
     }
 }
 
-function openApp(user){
+function openApp() {
+    document.getElementById("root").innerHTML = `
+        <div class="app">
+            <div class="sidebar">
+                <div class="server-logo">F</div>
+                
+                <div class="nav-group">
+                    <div class="nav-btn active" onclick="switchTab(0)">♫</div>
+                    <div class="nav-btn" onclick="switchTab(1)">💬</div>
+                    <div class="nav-btn" onclick="switchTab(2)">▶</div>
+                </div>
 
-document.body.innerHTML = `
+                <div class="profile-box" onclick="showProfile()">
+                    <div class="avatar">${currentUser.username[0].toUpperCase()}</div>
+                    <div class="profile-name">${currentUser.username}</div>
+                </div>
+            </div>
 
-<div class="app">
-
-    <div class="sidebar">
-
-        <div class="server-logo">
-            F
+            <div class="content" id="content"></div>
         </div>
+    `;
 
-        <div class="nav-group">
+    showMusic();
+}
 
-            <div
-                class="nav-indicator"
-                id="navIndicator"
-            ></div>
+// Переключение вкладок
+function switchTab(tab) {
+    if (tab === 0) showMusic();
+    else if (tab === 1) showChats();
+    else if (tab === 2) showVideo();
+}
 
-            <div
-                class="nav-btn active"
-                onclick="showMusic(this,0)"
-            >
-                ♫
-            </div>
-
-            <div
-                class="nav-btn"
-                onclick="showChats(this,1)"
-            >
-                ◉
-            </div>
-
-            <div
-                class="nav-btn"
-                onclick="showVideo(this,2)"
-            >
-                ▶
-            </div>
-
+function showMusic() {
+    document.getElementById("content").innerHTML = `
+        <div class="page-title">Музыка</div>
+        
+        <div class="search-container">
+            <input type="text" id="musicSearch" class="search" placeholder="Найти трек...">
+            <button class="create-btn" onclick="searchMusic()">Искать</button>
         </div>
+        
+        <div id="musicResults"></div>
+        <div id="playerContainer" style="margin-top: 30px; display: none;"></div>
+    `;
+}
 
-        <div
-            class="profile-box"
-            onclick="showProfile()"
-        >
+async function searchMusic() {
+    const query = document.getElementById("musicSearch").value.trim();
+    if (!query) return;
 
-            <div class="avatar">
-                ${user.username
-                    .charAt(0)
-                    .toUpperCase()}
-            </div>
+    const resultsContainer = document.getElementById("musicResults");
+    resultsContainer.innerHTML = "<p>Ищем...</p>";
 
-            <div class="profile-name">
-                ${user.username}
-            </div>
+    try {
+        const res = await fetch(`\( {SERVER}/search?q= \){encodeURIComponent(query)}`);
+        const tracks = await res.json();
 
-            <div class="profile-status">
-                ● Online
-            </div>
+        if (tracks.length === 0) {
+            resultsContainer.innerHTML = "<p>Ничего не найдено</p>";
+            return;
+        }
 
+        let html = "";
+        tracks.forEach(track => {
+            html += `
+                <div class="track" onclick="playTrack('\( {track.id}', ' \){track.title.replace(/'/g, "\\'")}', '${track.artist.replace(/'/g, "\\'")}')">
+                    <div class="track-info">
+                        <div class="track-title">${track.title}</div>
+                        <div class="track-artist">${track.artist}</div>
+                    </div>
+                </div>
+            `;
+        });
+
+        resultsContainer.innerHTML = html;
+    } catch (e) {
+        resultsContainer.innerHTML = "<p>Ошибка поиска</p>";
+    }
+}
+
+function playTrack(videoId, title, artist) {
+    const playerContainer = document.getElementById("playerContainer");
+    
+    playerContainer.style.display = "block";
+    playerContainer.innerHTML = `
+        <h3 style="margin-bottom: 12px;">Сейчас играет</h3>
+        <div style="position: relative; padding-top: 56.25%; background: #000; border-radius: 16px; overflow: hidden;">
+            <iframe 
+                width="100%" 
+                height="100%" 
+                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
+                src="https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen>
+            </iframe>
         </div>
+        <div style="margin-top: 12px; font-weight: 700;">${title}</div>
+        <div style="color: #999;">${artist}</div>
+    `;
 
-    </div>
-
-    <div
-        class="content"
-        id="content"
-    ></div>
-
-</div>
-
-`;
-
-showMusic(
-    document.querySelector(".nav-btn"),
-    0
-);
-
+    // Скролл к плееру
+    playerContainer.scrollIntoView({ behavior: "smooth" });
 }
 
-function moveIndicator(index){
-
-const indicator =
-    document.getElementById(
-        "navIndicator"
-    );
-
-if(!indicator) return;
-
-indicator.style.transform =
-    `translateY(${index * 58}px)`;
+// Заглушки для других разделов
+function showChats() {
+    document.getElementById("content").innerHTML = `
+        <div class="page-title">Чаты</div>
+        <div class="track">Личные сообщения и групповые чаты — скоро</div>
+    `;
 }
 
-function setActive(btn,index){
-
-document
-.querySelectorAll(".nav-btn")
-.forEach(el =>
-    el.classList.remove("active")
-);
-
-if(btn){
-
-    btn.classList.add("active");
-
-    moveIndicator(index);
-}
+function showVideo() {
+    document.getElementById("content").innerHTML = `
+        <div class="page-title">Видео</div>
+        <div class="track">Видеокомнаты и лента — в разработке</div>
+    `;
 }
 
-function showMusic(btn,index){
-
-setActive(btn,index);
-
-document.getElementById(
-    "content"
-).innerHTML = `
-
-<div class="page-title">
-Музыка
-</div>
-
-<div class="topbar">
-
-    <input
-        id="musicSearch"
-        class="search"
-        placeholder="Найти трек..."
-    >
-
-</div>
-
-<button
-    class="create-btn"
-    onclick="searchMusic()"
->
-Искать
-</button>
-
-<div id="musicResults"></div>
-
-`;
+function showProfile() {
+    document.getElementById("content").innerHTML = `
+        <div class="page-title">Профиль</div>
+        <div class="track">
+            <h3>${currentUser.username}</h3>
+            <p>${currentUser.status || "Без статуса"}</p>
+            <button class="create-btn" onclick="logout()" style="margin-top: 20px;">Выйти</button>
+        </div>
+    `;
 }
 
-async function searchMusic(){
-
-const q =
-document
-.getElementById(
-    "musicSearch"
-)
-.value
-.trim();
-
-if(!q) return;
-
-const results =
-document.getElementById(
-    "musicResults"
-);
-
-results.innerHTML =
-"Поиск...";
-
-try{
-
-const response =
-await fetch(
-`${SERVER}/search?q=` +
-encodeURIComponent(q)
-);
-
-const tracks =
-await response.json();
-
-results.innerHTML =
-tracks.map(track => `
-
-<div class="track">
-
-    <div class="track-title">
-        ${track.title}
-    </div>
-
-    <div class="track-artist">
-        ${track.artist}
-    </div>
-
-    <button
-        class="create-btn"
-        onclick="openTrack('${track.id}')"
-    >
-        Открыть
-    </button>
-
-</div>
-
-`).join("");
-
-}catch{
-
-results.innerHTML =
-"Ошибка поиска";
-}
-}
-
-function openTrack(id){
-
-window.open(
-`https://www.youtube.com/watch?v=${id}`,
-"_blank"
-);
-}
-
-function showChats(btn,index){
-
-setActive(btn,index);
-
-document.getElementById(
-"content"
-).innerHTML = `
-
-<div class="page-title">
-Чаты
-</div>
-
-<div class="track">
-Личные сообщения скоро появятся
-</div>
-
-<div class="track">
-Групповые чаты в разработке
-</div>
-
-`;
-}
-
-function showVideo(btn,index){
-
-setActive(btn,index);
-
-document.getElementById(
-"content"
-).innerHTML = `
-
-<div class="page-title">
-Видео
-</div>
-
-<div class="track">
-Видео-раздел находится в разработке
-</div>
-
-`;
-}
-
-function showProfile(){
-
-const user =
-JSON.parse(
-localStorage.getItem(
-    "frappy_user"
-)
-);
-
-document.getElementById(
-"content"
-).innerHTML = `
-
-<div class="page-title">
-Профиль
-</div>
-
-<div class="track">
-
-    <div style="
-        font-size:28px;
-        font-weight:800;
-        margin-bottom:10px;
-    ">
-        ${user.username}
-    </div>
-
-    <div style="
-        color:#999;
-        margin-bottom:20px;
-    ">
-        ${user.status || "Без статуса"}
-    </div>
-
-    <button
-        class="create-btn"
-        onclick="logout()"
-    >
-        Выйти
-    </button>
-
-</div>
-
-`;
-}
-
-function logout(){
-
-localStorage.removeItem(
-"frappy_user"
-);
-
-location.reload();
-
+function logout() {
+    localStorage.removeItem("frappy_user");
+    location.reload();
 }
