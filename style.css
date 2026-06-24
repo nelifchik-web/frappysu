@@ -201,7 +201,85 @@ body {
     margin-top: 4px;
 }
 
-/* 📱 ПОЛНЫЙ ЖЕЛЕЗОБЕТОННЫЙ ЖЕСТКИЙ ФИКС ДЛЯ СМАРТФОНОВ */
+/* SPOTIFY MINI PLAYER */
+#miniPlayer {
+    background: rgba(20, 20, 20, 0.92) !important;
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 14px;
+    position: fixed !important;
+    bottom: 75px !important;
+    left: 8px !important;
+    right: 8px !important;
+    padding: 12px 16px !important;
+    z-index: 9998 !important;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.7);
+}
+
+.spotify-player-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.spotify-track-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.spotify-title {
+    font-weight: 700;
+    font-size: 14px;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.spotify-artist {
+    font-size: 12px;
+    color: #b3b3b3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+}
+
+.spotify-controls {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+}
+
+.spotify-ctrl-btn {
+    background: transparent !important;
+    color: #b3b3b3 !important;
+    border: none !important;
+    font-size: 14px;
+    cursor: pointer;
+    transition: color 0.2s;
+    padding: 4px;
+}
+
+.spotify-play-btn {
+    background: #fff !important;
+    color: #000 !important;
+    border: none !important;
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 50% !important;
+    font-size: 14px !important;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+/* 📱 ПОЛНЫЙ МОБИЛЬНЫЙ ФИКС ДЛЯ СМАРТФОНОВ (ТГ СТЕКЛО) */
 @media (max-width: 768px) {
     body {
         background: #050505 !important;
@@ -222,7 +300,6 @@ body {
         padding: 20px 16px 100px 16px; 
     }
 
-    /* Настоящая стеклянная Telegram-панель */
     .sidebar {
         position: fixed;
         bottom: 0;
@@ -247,7 +324,6 @@ body {
         display: none !important;
     }
 
-    /* Полностью прозрачные и выровненные кнопки */
     .nav-btn {
         width: 60px !important;
         height: 100% !important;
@@ -267,7 +343,6 @@ body {
         color: #b86cff !important;
     }
 
-    /* Неоновая линия над активной кнопкой */
     .nav-btn.active::after {
         content: '';
         position: absolute;
@@ -280,7 +355,6 @@ body {
         border-radius: 4px;
     }
 
-    /* Фикс блока аватарки профиля в нижней панели */
     .sidebar div[onclick="showProfile()"] {
         margin-top: 0 !important;
         padding: 0 !important;
@@ -300,7 +374,6 @@ body {
         justify-content: center !important;
     }
 
-    /* Фикс инпутов и кнопок поиска */
     .search {
         background: #101010 !important;
         border: 1px solid #222 !important;
