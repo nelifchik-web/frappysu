@@ -59,7 +59,6 @@ async function createProfile() {
 }
 
 function openApp() {
-    // Безопасно берем первую букву имени для аватарки
     const firstLetter = currentUser && currentUser.username ? currentUser.username[0].toUpperCase() : "U";
 
     document.getElementById("root").innerHTML = `
@@ -111,7 +110,6 @@ async function searchMusic() {
 
         let html = "";
         tracks.forEach(track => {
-            // Экранируем кавычки, чтобы строки внутри onclick не ломали HTML
             const safeTitle = track.title.replace(/"/g, "&quot;").replace(/'/g, "\\'");
             const safeArtist = track.artist.replace(/"/g, "&quot;").replace(/'/g, "\\'");
             
@@ -134,7 +132,6 @@ function playTrack(videoId, title, artist) {
     const mini = document.getElementById("miniPlayer");
     mini.style.display = "block";
     
-    // Сразу показываем плеер открытым, так как мобильный YouTube требует клика от пользователя
     mini.innerHTML = `
         <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px;">
             <div style="flex:1;min-width:0;">
