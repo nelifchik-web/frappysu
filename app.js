@@ -1,9 +1,18 @@
 const SERVER = "https://frappy-server.onrender.com";
 
 let currentUser = null;
+let currentPlaylist = [];
+let currentTrackIndex = -1;
+// Создаем глобальный аудиообъект HTML5, независимый от YouTube фреймов
+let audioPlayer = new Audio(); 
 
 document.addEventListener("DOMContentLoaded", () => {
     checkLogin();
+    
+    // Автоматическое переключение на следующий трек, когда текущий доиграл до конца
+    audioPlayer.addEventListener("ended", () => {
+        nextTrack();
+    });
 });
 
 function checkLogin() {
@@ -38,7 +47,6 @@ async function createProfile() {
     const msg = document.getElementById("message");
 
     if (!username) return msg.textContent = "Ник обязателен!";
-
     msg.textContent = "Создаём...";
 
     try {
@@ -74,7 +82,7 @@ function openApp() {
             </div>
             <div class="content" id="content"></div>
         </div>
-        <div id="miniPlayer" style="display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,10,0.98);border-top:2px solid #b86cff;padding:12px 16px;z-index:1000;"></div>
+        <div id="miniPlayer" style="display:none;"></div>
     `;
     showMusic();
 }
@@ -97,11 +105,8 @@ function showMusic() {
     `;
 
     document.getElementById("searchBtn").addEventListener("click", searchMusic);
-
     document.getElementById("musicSearch").addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-            searchMusic();
-        }
+        if (event.key === "Enter") searchMusic();
     });
 }
 
@@ -110,19 +115,18 @@ async function searchMusic() {
     if (!query) return;
 
     const container = document.getElementById("musicResults");
-    container.innerHTML = `<p style="color:#b86cff">Поиск треков...</p>`;
+    container.innerHTML = `<p style="color:#b86cff">Поиск в базе без VPN...</p>`;
 
     try {
         const res = await fetch(`${SERVER}/search?q=` + encodeURIComponent(query));
         const tracks = await res.json();
 
+        currentPlaylist = tracks;
+
         let html = "";
-        tracks.forEach(track => {
-            const safeTitle = track.title.replace(/"/g, "&quot;").replace(/'/g, "\\'");
-            const safeArtist = track.artist.replace(/"/g, "&quot;").replace(/'/g, "\\'");
-            
+        tracks.forEach((track, index) => {
             html += `
-                <div class="track" onclick="playTrack('${track.id}', '${safeTitle}', '${safeArtist}')">
+                <div class="track" onclick="playTrackFromPlaylist(${index})">
                     <div class="track-info">
                         <div class="track-title">${track.title}</div>
                         <div class="track-artist">${track.artist}</div>
@@ -130,49 +134,74 @@ async function searchMusic() {
                 </div>
             `;
         });
-        container.innerHTML = html || "<p>Ничего не найдено :(</p>";
+        container.innerHTML = html || "<p>Ничего не найдено в свободной базе :(</p>";
     } catch (e) {
-        container.innerHTML = `<p style="color:#ff6666">Ошибка поиска</p>`;
+        container.innerHTML = `<p style="color:#ff6666">Ошибка соединения</p>`;
     }
 }
 
-function playTrack(videoId, title, artist) {
+function playTrackFromPlaylist(index) {
+    if (index < 0 || index >= currentPlaylist.length) return;
+    
+    currentTrackIndex = index;
+    const track = currentPlaylist[index];
+    
+    playTrack(track.url, track.title, track.artist);
+}
+
+function playTrack(audioUrl, title, artist) {
     const mini = document.getElementById("miniPlayer");
     mini.style.display = "block";
     
     mini.innerHTML = `
-        <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px;">
-            <div style="flex:1;min-width:0;">
-                <div style="font-weight:700;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${title}</div>
-                <div style="color:#aaa;font-size:14px;">${artist}</div>
+        <div class="spotify-player-inner">
+            <div class="spotify-track-info">
+                <div class="spotify-title">${title}</div>
+                <div class="spotify-artist">${artist}</div>
             </div>
-            <button onclick="togglePlay(this)" style="background:#b86cff;color:white;border:none;width:56px;height:56px;border-radius:50%;font-size:24px;flex-shrink:0;">❚❚</button>
+            <div class="spotify-controls">
+                <button onclick="prevTrack()" class="spotify-ctrl-btn">◀◀</button>
+                <button onclick="togglePlay(this)" class="spotify-play-btn" id="globalPlayBtn">❚❚</button>
+                <button onclick="nextTrack()" class="spotify-ctrl-btn">▶▶</button>
+            </div>
         </div>
-        <iframe id="ytPlayer" width="100%" height="200" style="border-radius:12px;display:block;" 
-            src="https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1" 
-            frameborder="0" allowfullscreen></iframe>
     `;
+
+    // Загружаем и воспроизводим чистый аудиопоток
+    audioPlayer.src = audioUrl;
+    audioPlayer.play().catch(e => console.log("Ошибка автоплея: ", e));
 }
 
 function togglePlay(btn) {
-    const iframe = document.getElementById("ytPlayer");
-    if (iframe.style.display === "none") {
-        iframe.style.display = "block";
-        iframe.height = "200";
+    if (audioPlayer.paused) {
+        audioPlayer.play();
         btn.textContent = "❚❚";
     } else {
-        iframe.style.display = "none";
-        iframe.height = "0";
+        audioPlayer.pause();
         btn.textContent = "▶";
     }
 }
 
+function nextTrack() {
+    if (currentPlaylist.length === 0) return;
+    let nextIndex = currentTrackIndex + 1;
+    if (nextIndex >= currentPlaylist.length) nextIndex = 0; 
+    playTrackFromPlaylist(nextIndex);
+}
+
+function prevTrack() {
+    if (currentPlaylist.length === 0) return;
+    let prevIndex = currentTrackIndex - 1;
+    if (prevIndex < 0) prevIndex = currentPlaylist.length - 1;
+    playTrackFromPlaylist(prevIndex);
+}
+
 function showChats() {
-    document.getElementById("content").innerHTML = `<div class="page-title">Чаты</div><div class="track">Скоро будет</div>`;
+    document.getElementById("content").innerHTML = `<div class="page-title">Чаты</div><div class="track">Раздел чатов готовится</div>`;
 }
 
 function showVideo() {
-    document.getElementById("content").innerHTML = `<div class="page-title">Видео</div><div class="track">Скоро будет</div>`;
+    document.getElementById("content").innerHTML = `<div class="page-title">Видео</div><div class="track">Раздел видео готовится</div>`;
 }
 
 function showProfile() {
