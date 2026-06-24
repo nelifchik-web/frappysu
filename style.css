@@ -1,207 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
-    -webkit-tap-highlight-color: transparent;
-}
-
-body {
-    background: #050505;
-    color: #fff;
-    height: 100vh;
-    font-size: 16px;
-    overflow-x: hidden; 
-}
-
-/* PROFILE SETUP */
-.profile-setup {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-    background: radial-gradient(circle at center, #1a0033, #050505);
-}
-
-.setup-card {
-    width: 100%;
-    max-width: 400px;
-    padding: 32px 24px;
-    border-radius: 24px;
-    background: rgba(16,16,16,0.95);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    text-align: center;
-}
-
-.logo {
-    font-size: 48px;
-    font-weight: 900;
-    background: linear-gradient(135deg, #b86cff, #7b2cff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 10px;
-}
-
-.setup-card h2 {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 24px;
-    color: #ccc;
-}
-
-.input {
-    width: 100%;
-    padding: 14px 20px;
-    background: #141414;
-    border: 1px solid #262626;
-    border-radius: 14px;
-    color: #fff;
-    font-size: 15px;
-    margin-bottom: 12px;
-    outline: none;
-    transition: 0.2s;
-}
-
-.input:focus {
-    border-color: #b86cff;
-}
-
-/* APP LAYOUT */
-.app {
-    display: flex;
-    height: 100vh;
-    width: 100vw;
-}
-
-.sidebar {
-    width: 72px;
-    background: #080808;
-    border-right: 1px solid #141414;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 16px 0;
-    flex-shrink: 0;
-}
-
-.server-logo {
-    width: 52px;
-    height: 52px;
-    border-radius: 16px;
-    background: linear-gradient(135deg, #b86cff, #7b2cff);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    font-weight: 900;
-    margin-bottom: 24px;
-    box-shadow: 0 0 20px rgba(184, 108, 255, 0.3);
-}
-
-.nav-btn {
-    width: 52px;
-    height: 52px;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    color: #666;
-    margin: 4px 0;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.nav-btn.active,
-.nav-btn:hover {
-    color: #fff;
-    background: rgba(184, 108, 255, 0.2);
-}
-
-/* MAIN CONTENT */
-.content {
-    flex: 1;
-    overflow-y: auto;
-    padding: 24px;
-    background: #050505;
-    padding-bottom: 120px; 
-}
-
-.page-title {
-    font-size: 32px;
-    font-weight: 800;
-    margin-bottom: 24px;
-}
-
-.search-container {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 24px;
-}
-
-.search {
-    width: 100%;
-    padding: 16px 20px;
-    background: #101010;
-    border: 1px solid #222;
-    border-radius: 16px;
-    color: #fff;
-    font-size: 16px;
-    outline: none;
-}
-
-.search:focus {
-    border-color: #b86cff;
-}
-
-.create-btn {
-    width: 100%;
-    padding: 16px;
-    background: linear-gradient(135deg, #b86cff, #7b2cff);
-    border: none;
-    border-radius: 16px;
-    color: white;
-    font-weight: 700;
-    font-size: 16px;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(184, 108, 255, 0.25);
-}
-
-.track {
-    background: #101010;
-    border: 1px solid #1a1a1a;
-    border-radius: 16px;
-    padding: 16px;
-    margin-bottom: 12px;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.track:hover {
-    border-color: rgba(184, 108, 255, 0.5);
-    background: #141414;
-}
-
-.track-title {
-    font-weight: 700;
-    font-size: 16px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.track-artist {
-    color: #888;
-    font-size: 14px;
-    margin-top: 4px;
-}
-
-/* 📱 АДАПТИВНОСТЬ ПОД ТЕЛЕФОНЫ (ЭФФЕКТ СТЕКЛА) */
 @media (max-width: 768px) {
     .app {
         flex-direction: column-reverse; 
@@ -209,14 +5,15 @@ body {
 
     .sidebar {
         width: 100%;
-        height: 64px;
+        height: 65px; /* Фиксированная высота панели */
         flex-direction: row; 
         justify-content: space-around;
-        padding: 0 16px;
+        align-items: center; /* Выравниваем все строго по центру */
+        padding: 0 10px;
         border-right: none;
         
-        /* Стекло как в ТГ */
-        background: rgba(10, 10, 10, 0.65); 
+        /* Эффект стекла */
+        background: rgba(15, 15, 15, 0.7) !important; 
         backdrop-filter: blur(20px);        
         -webkit-backdrop-filter: blur(20px); 
         border-top: 1px solid rgba(255, 255, 255, 0.08); 
@@ -225,23 +22,67 @@ body {
         bottom: 0;
         left: 0;
         z-index: 999;
-        box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.5); 
+        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5); 
     }
 
     .server-logo {
         display: none; 
     }
 
+    /* Чистим кнопки от квадратов и фонов */
     .nav-btn {
-        width: 20%;
+        width: auto;
         height: 100%;
-        margin: 0;
+        margin: 0 !important;
+        padding: 0 15px;
         border-radius: 0;
+        background: transparent !important; /* Убираем фиолетовые/серые квадраты */
+        color: #666; /* Неактивные иконки */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        position: relative;
+    }
+
+    /* Подсветка активной иконки */
+    .nav-btn.active {
+        color: #b86cff !important; 
+    }
+
+    /* Полосочка над активным табом */
+    .nav-btn.active::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 10%;
+        right: 10%;
+        height: 3px;
+        background: #b86cff;
+        box-shadow: 0 0 10px #b86cff;
+        border-radius: 4px;
+    }
+
+    /* Выравниваем блок с аватаркой в меню */
+    .sidebar div[onclick="showProfile()"] {
+        margin-top: 0 !important;
+        padding: 0 !important;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .sidebar div[onclick="showProfile()"] > div {
+        width: 38px !important; /* Делаем аватарку чуть компактнее для мобильных */
+        height: 38px !important;
+        margin: 0 !important;
+        font-size: 14px;
     }
 
     .content {
         padding: 16px;
-        padding-bottom: 160px; 
+        padding-bottom: 140px; 
     }
 
     .page-title {
