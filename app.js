@@ -88,7 +88,7 @@ function showMusic() {
     document.getElementById("content").innerHTML = `
         <div class="page-title">Музыка</div>
         <div class="search-container">
-            <input type="text" id="musicSearch" class="search" placeholder="Найти трек...">
+            <input type="text" id="musicSearch" class="search" placeholder="Найти трек или артиста...">
             <button class="create-btn" onclick="searchMusic()">Искать</button>
         </div>
         <div id="musicResults" style="margin-top:20px;"></div>
@@ -100,7 +100,7 @@ async function searchMusic() {
     if (!query) return;
 
     const container = document.getElementById("musicResults");
-    container.innerHTML = `<p style="color:#b86cff">Поиск...</p>`;
+    container.innerHTML = `<p style="color:#b86cff">Поиск треков...</p>`;
 
     try {
         const res = await fetch(`${SERVER}/search?q=` + encodeURIComponent(query));
@@ -117,7 +117,7 @@ async function searchMusic() {
                 </div>
             `;
         });
-        container.innerHTML = html || "<p>Ничего не найдено</p>";
+        container.innerHTML = html || "<p>Ничего не найдено :(</p>";
     } catch (e) {
         container.innerHTML = `<p style="color:#ff6666">Ошибка поиска</p>`;
     }
@@ -128,14 +128,15 @@ function playTrack(videoId, title, artist) {
     mini.style.display = "block";
     mini.innerHTML = `
         <div style="display:flex;align-items:center;gap:16px;">
-            <div style="flex:1;">
-                <div style="font-weight:700;">${title}</div>
-                <div style="color:#aaa;">${artist}</div>
+            <div style="flex:1;min-width:0;">
+                <div style="font-weight:700;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${title}</div>
+                <div style="color:#aaa;font-size:14px;">${artist}</div>
             </div>
-            <button onclick="togglePlay(this)" style="background:#b86cff;color:white;border:none;width:56px;height:56px;border-radius:50%;font-size:24px;">▶</button>
+            <button onclick="togglePlay(this)" style="background:#b86cff;color:white;border:none;width:56px;height:56px;border-radius:50%;font-size:24px;flex-shrink:0;">▶</button>
         </div>
-        <iframe id="ytPlayer" width="100%" height="0" style="margin-top:12px;display:none;border-radius:12px;" 
-            src="https://www.youtube.com/embed/${videoId}?autoplay=1" frameborder="0" allowfullscreen></iframe>
+        <iframe id="ytPlayer" width="100%" height="0" style="margin-top:12px;border-radius:12px;display:none;" 
+            src="https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1" 
+            frameborder="0" allowfullscreen></iframe>
     `;
 }
 
@@ -153,11 +154,11 @@ function togglePlay(btn) {
 }
 
 function showChats() {
-    document.getElementById("content").innerHTML = `<div class="page-title">Чаты</div><div class="track">Скоро...</div>`;
+    document.getElementById("content").innerHTML = `<div class="page-title">Чаты</div><div class="track">Скоро будет</div>`;
 }
 
 function showVideo() {
-    document.getElementById("content").innerHTML = `<div class="page-title">Видео</div><div class="track">Скоро...</div>`;
+    document.getElementById("content").innerHTML = `<div class="page-title">Видео</div><div class="track">Скоро будет</div>`;
 }
 
 function showProfile() {
