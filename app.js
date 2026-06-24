@@ -91,10 +91,18 @@ function showMusic() {
         <div class="page-title">Музыка</div>
         <div class="search-container">
             <input type="text" id="musicSearch" class="search" placeholder="Найти трек или артиста...">
-            <button class="create-btn" onclick="searchMusic()">Искать</button>
+            <button class="create-btn" id="searchBtn">Искать</button>
         </div>
         <div id="musicResults" style="margin-top:20px;"></div>
     `;
+
+    document.getElementById("searchBtn").addEventListener("click", searchMusic);
+
+    document.getElementById("musicSearch").addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+            searchMusic();
+        }
+    });
 }
 
 async function searchMusic() {
