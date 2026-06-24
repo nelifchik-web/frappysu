@@ -34,7 +34,7 @@ app.post("/create-profile", (req, res) => {
     res.json({ success: true, user });
 });
 
-// SEARCH — главное
+// SEARCH
 app.get("/search", async (req, res) => {
     const q = req.query.q;
     if (!q) return res.json([]);
