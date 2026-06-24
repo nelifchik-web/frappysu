@@ -3,13 +3,12 @@ const SERVER = "https://frappy-server.onrender.com";
 let currentUser = null;
 let currentPlaylist = [];
 let currentTrackIndex = -1;
-// Создаем глобальный аудиообъект HTML5, независимый от YouTube фреймов
 let audioPlayer = new Audio(); 
 
 document.addEventListener("DOMContentLoaded", () => {
     checkLogin();
     
-    // Автоматическое переключение на следующий трек, когда текущий доиграл до конца
+    // Когда трек доиграл до конца, автоматически включается следующий
     audioPlayer.addEventListener("ended", () => {
         nextTrack();
     });
@@ -98,7 +97,7 @@ function showMusic() {
     document.getElementById("content").innerHTML = `
         <div class="page-title">Музыка</div>
         <div class="search-container">
-            <input type="text" id="musicSearch" class="search" placeholder="Найти трек или артиста...">
+            <input type="text" id="musicSearch" class="search" placeholder="Введите трек (например: ACIDTEKK)">
             <button class="create-btn" id="searchBtn">Искать</button>
         </div>
         <div id="musicResults" style="margin-top:20px;"></div>
@@ -115,7 +114,7 @@ async function searchMusic() {
     if (!query) return;
 
     const container = document.getElementById("musicResults");
-    container.innerHTML = `<p style="color:#b86cff">Поиск в базе без VPN...</p>`;
+    container.innerHTML = `<p style="color:#b86cff">Глобальный поиск по базе...</p>`;
 
     try {
         const res = await fetch(`${SERVER}/search?q=` + encodeURIComponent(query));
@@ -134,9 +133,9 @@ async function searchMusic() {
                 </div>
             `;
         });
-        container.innerHTML = html || "<p>Ничего не найдено в свободной базе :(</p>";
+        container.innerHTML = html || "<p>Ничего не найдено по этому запросу :(</p>";
     } catch (e) {
-        container.innerHTML = `<p style="color:#ff6666">Ошибка соединения</p>`;
+        container.innerHTML = `<p style="color:#ff6666">Ошибка поиска</p>`;
     }
 }
 
@@ -167,7 +166,6 @@ function playTrack(audioUrl, title, artist) {
         </div>
     `;
 
-    // Загружаем и воспроизводим чистый аудиопоток
     audioPlayer.src = audioUrl;
     audioPlayer.play().catch(e => console.log("Ошибка автоплея: ", e));
 }
